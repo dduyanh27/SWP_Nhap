@@ -23,10 +23,6 @@
                                 <span>|</span>
                                 <a href="${pageContext.request.contextPath}/admin/dashboard">Admin</a>
                             </c:if>
-                            <c:if test="${sessionScope.isSalesStaff}">
-                                <span>|</span>
-                                <a href="${pageContext.request.contextPath}/sales/dashboard">Kênh Bán Hàng</a>
-                            </c:if>
                             <span>|</span>
                             <a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
                             <span>|</span>

@@ -13,3 +13,4 @@ public interface InboundBatchItemsRepository extends JpaRepository<InboundBatchI
     @Query("SELECT COUNT(i) FROM InboundBatchItem i WHERE i.itemStatus = 'ACTIVE' AND i.expiryDate >= :today AND i.expiryDate <= :targetDate")
     long countExpiringSoonLotes(@Param("today") LocalDate today, @Param("targetDate") LocalDate targetDate);
 }
+

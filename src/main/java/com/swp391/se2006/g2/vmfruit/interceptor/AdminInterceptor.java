@@ -9,72 +9,64 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.List;
-
 @Component
 public class AdminInterceptor implements HandlerInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(AdminInterceptor.class);
 
-    // Các path chỉ ADMIN mới được vào (SALES_STAFF bị chặn)
-    private static final List<String> ADMIN_ONLY_PATHS = List.of(
-            "/admin/users",
-            "/admin/reports",
-            "/admin/dashboard"
-    );
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        HttpSession session = request.getSession(false); // false = không tạo session mới nếu chưa có
+        HttpSession session = request.getSession(false);
 
-        log.debug("AdminInterceptor: Checking URI = {}", request.getRequestURI());
+        String path = request.getRequestURI().substring(request.getContextPath().length());
+        log.debug("AdminInterceptor: Kiểm tra path = {}", path);
 
-        // Lấy user từ session
         User currentUser = null;
         if (session != null) {
             currentUser = (User) session.getAttribute("currentUser");
         }
 
+        // 1. Nếu chưa đăng nhập -> Chuyển hướng về trang login
         if (currentUser == null) {
-            log.debug("AdminInterceptor: Chưa đăng nhập → redirect /login?error=nologin");
+            log.warn("AdminInterceptor: Chưa đăng nhập khi vào {}, redirect /login", path);
             response.sendRedirect(request.getContextPath() + "/login?error=nologin");
             return false;
         }
 
-        // Ưu tiên đọc role từ session (đã được set khi đăng nhập), tránh query DB lại mỗi request
+        // 2. Đọc quyền từ session, nếu null thì mặc định gán là false thay vì crash/báo lỗi
         Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
         Boolean isSalesStaff = (Boolean) session.getAttribute("isSalesStaff");
 
-        // Fallback: nếu session không có (ví dụ Google OAuth redirect thẳng), đọc từ DB
-        if (isAdmin == null || isSalesStaff == null) {
-            log.warn("AdminInterceptor: Session thiếu isAdmin/isSalesStaff cho userId={}. Session có thể đã hết hạn hoặc OAuth login chưa set.", currentUser.getUserId());
-            response.sendRedirect(request.getContextPath() + "/login?error=nologin");
-            return false;
-        }
+        if (isAdmin == null) isAdmin = false;
+        if (isSalesStaff == null) isSalesStaff = false;
 
-        // Lấy path tương đối so với context
-        String path = request.getRequestURI().substring(request.getContextPath().length());
-        log.debug("AdminInterceptor: userId={}, path={}, isAdmin={}, isSalesStaff={}", currentUser.getUserId(), path, isAdmin, isSalesStaff);
+        log.info("AdminInterceptor: userId={}, path={}, isAdmin={}, isSalesStaff={}",
+                currentUser.getUserId(), path, isAdmin, isSalesStaff);
 
-        if (Boolean.TRUE.equals(isAdmin)) {
-            log.debug("AdminInterceptor: ADMIN → cho phép truy cập {}", path);
-            return true;
-        }
-
-        if (Boolean.TRUE.equals(isSalesStaff)) {
-            boolean isAccessingAdminOnly = ADMIN_ONLY_PATHS.stream().anyMatch(path::startsWith);
-            if (isAccessingAdminOnly) {
-                log.debug("AdminInterceptor: SALES_STAFF cố vào admin-only path → redirect /sales/dashboard");
+        // 3. Kiểm tra phân quyền cho phân vùng /admin/**
+        if (path.startsWith("/admin")) {
+            if (Boolean.TRUE.equals(isAdmin)) {
+                return true; // Hợp lệ, cho Admin đi tiếp
+            }
+            if (Boolean.TRUE.equals(isSalesStaff)) {
+                log.warn("AdminInterceptor: Sales cố vào admin -> redirect /sales/dashboard");
                 response.sendRedirect(request.getContextPath() + "/sales/dashboard");
                 return false;
             }
-            log.debug("AdminInterceptor: SALES_STAFF → cho phép truy cập {}", path);
-            return true;
+            // Khách hàng vãng lai cố vào admin -> Đá ra trang chủ
+            response.sendRedirect(request.getContextPath() + "/?error=unauthorized");
+            return false;
         }
 
-        // CUSTOMER hoặc role khác → về trang chủ
-        log.debug("AdminInterceptor: Role không hợp lệ → redirect /");
-        response.sendRedirect(request.getContextPath() + "/");
-        return false;
+        // 4. Kiểm tra phân quyền cho phân vùng /sales/**
+        if (path.startsWith("/sales")) {
+            if (Boolean.TRUE.equals(isSalesStaff) || Boolean.TRUE.equals(isAdmin)) {
+                return true; // Cho phép Sales hoặc Admin đi tiếp
+            }
+            response.sendRedirect(request.getContextPath() + "/?error=unauthorized");
+            return false;
+        }
+
+        return true;
     }
 }

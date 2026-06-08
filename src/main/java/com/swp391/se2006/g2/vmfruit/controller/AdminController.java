@@ -2,8 +2,11 @@ package com.swp391.se2006.g2.vmfruit.controller;
 
 import com.swp391.se2006.g2.vmfruit.dto.response.ProductRowResponse;
 import com.swp391.se2006.g2.vmfruit.dto.response.ProductStatsResponse;
+import com.swp391.se2006.g2.vmfruit.entity.User;
 import com.swp391.se2006.g2.vmfruit.service.AdminProductService;
 import com.swp391.se2006.g2.vmfruit.service.AdminService;
+import com.swp391.se2006.g2.vmfruit.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +21,23 @@ public class AdminController {
 
     private final AdminService adminService;
     private final AdminProductService adminProductService;
+    private final UserService userService;
 
-    public AdminController(AdminService adminService, AdminProductService adminProductService) {
+    public AdminController(AdminService adminService, AdminProductService adminProductService, UserService userService) {
         this.adminService = adminService;
         this.adminProductService = adminProductService;
+        this.userService = userService;
     }
 
     @GetMapping("/dashboard")
-    public String showDashboard(Model model) {
+    public String showDashboard(HttpSession session, Model model) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+        if (!userService.isAdmin(currentUser.getUserId())) {
+            return "redirect:/login";
+        }
         Map<String, Object> stats = adminService.getDashboardStats();
         model.addAllAttributes(stats);
         model.addAttribute("contentPage", "admin/dashboard");

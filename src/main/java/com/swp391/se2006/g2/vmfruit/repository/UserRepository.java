@@ -12,9 +12,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByPhone(String phone);
 
-    // Dùng findFirstByPhone thay vì findByPhone để không bị IncorrectResultSizeDataAccessException
-    // khi DB có 2 bản ghi trùng SĐT (vd: admin bị duplicate). findFirst = TOP 1 trong SQL.
-    Optional<User> findFirstByPhone(String phone);
+    Optional<User> findByPhone(String phone);
 
     Optional<User> findByEmailIgnoreCase(String email);
 

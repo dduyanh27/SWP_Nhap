@@ -15,8 +15,7 @@ public class AdminProductImpl implements AdminProductService {
     private final ProductRepository productRepository;
     private final InboundBatchItemsRepository inboundBatchItemsRepository;
 
-    public AdminProductImpl(ProductRepository productRepository,
-            InboundBatchItemsRepository inboundBatchItemsRepository) {
+    public AdminProductImpl(ProductRepository productRepository, InboundBatchItemsRepository inboundBatchItemsRepository) {
         this.productRepository = productRepository;
         this.inboundBatchItemsRepository = inboundBatchItemsRepository;
     }

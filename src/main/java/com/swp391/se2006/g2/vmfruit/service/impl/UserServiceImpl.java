@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
             throw new LoginException("Mật khẩu không được để trống.");
         }
 
-        User user = userRepository.findFirstByPhone(phone)
+        User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new LoginException("Số điện thoại hoặc mật khẩu không chính xác."));
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
@@ -150,12 +150,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean isAdmin(Integer userId) {
-        return userRoleRepository.countByUserIdAndRoleName(userId, "ADMIN") > 0;
-    }
-
-    @Override
-    public boolean isSalesStaff(Integer userId) {
-        return userRoleRepository.countByUserIdAndRoleName(userId, "SALES_STAFF") > 0;
+        return userRoleRepository.existsByUserUserIdAndRoleRoleName(userId, "ADMIN");
     }
 
     private static String trim(String value) {

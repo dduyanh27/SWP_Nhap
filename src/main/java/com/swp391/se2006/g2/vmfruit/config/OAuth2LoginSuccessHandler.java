@@ -85,13 +85,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         boolean isAdmin = userService.isAdmin(user.getUserId());
         session.setAttribute("isAdmin", isAdmin);
 
-        boolean isSalesStaff = userService.isSalesStaff(user.getUserId());
-        session.setAttribute("isSalesStaff", isSalesStaff);
-
         if (isAdmin) {
             response.sendRedirect("/admin/dashboard");
-        } else if (isSalesStaff) {
-            response.sendRedirect("/sales/dashboard");
         } else {
             response.sendRedirect("/");
         }

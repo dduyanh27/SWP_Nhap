@@ -15,6 +15,4 @@ public interface UserService {
     void updatePassword(Integer userId, String newPassword);
 
     boolean isAdmin(Integer userId);
-
-    boolean isSalesStaff(Integer userId);
 }
