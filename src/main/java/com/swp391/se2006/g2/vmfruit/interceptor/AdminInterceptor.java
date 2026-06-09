@@ -17,7 +17,6 @@ public class AdminInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HttpSession session = request.getSession(false);
-
         String path = request.getRequestURI().substring(request.getContextPath().length());
         log.debug("AdminInterceptor: Kiểm tra path = {}", path);
 
@@ -26,14 +25,14 @@ public class AdminInterceptor implements HandlerInterceptor {
             currentUser = (User) session.getAttribute("currentUser");
         }
 
-        // 1. Nếu chưa đăng nhập -> Chuyển hướng về trang login
+        // 1. Chưa đăng nhập -> Đá về login
         if (currentUser == null) {
             log.warn("AdminInterceptor: Chưa đăng nhập khi vào {}, redirect /login", path);
             response.sendRedirect(request.getContextPath() + "/login?error=nologin");
             return false;
         }
 
-        // 2. Đọc quyền từ session, nếu null thì mặc định gán là false thay vì crash/báo lỗi
+        // 2. Đọc quyền từ session, nếu null gán mặc định false tránh bị lỗi bậy bạ
         Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
         Boolean isSalesStaff = (Boolean) session.getAttribute("isSalesStaff");
 
@@ -43,25 +42,23 @@ public class AdminInterceptor implements HandlerInterceptor {
         log.info("AdminInterceptor: userId={}, path={}, isAdmin={}, isSalesStaff={}",
                 currentUser.getUserId(), path, isAdmin, isSalesStaff);
 
-        // 3. Kiểm tra phân quyền cho phân vùng /admin/**
+        // 3. Kiểm tra phân quyền vùng /admin/**
         if (path.startsWith("/admin")) {
             if (Boolean.TRUE.equals(isAdmin)) {
-                return true; // Hợp lệ, cho Admin đi tiếp
+                return true; // Admin hợp lệ, cho đi tiếp
             }
             if (Boolean.TRUE.equals(isSalesStaff)) {
-                log.warn("AdminInterceptor: Sales cố vào admin -> redirect /sales/dashboard");
                 response.sendRedirect(request.getContextPath() + "/sales/dashboard");
                 return false;
             }
-            // Khách hàng vãng lai cố vào admin -> Đá ra trang chủ
             response.sendRedirect(request.getContextPath() + "/?error=unauthorized");
             return false;
         }
 
-        // 4. Kiểm tra phân quyền cho phân vùng /sales/**
+        // 4. Kiểm tra phân quyền vùng /sales/**
         if (path.startsWith("/sales")) {
             if (Boolean.TRUE.equals(isSalesStaff) || Boolean.TRUE.equals(isAdmin)) {
-                return true; // Cho phép Sales hoặc Admin đi tiếp
+                return true; // Sales hoặc Admin đều có thể vào xem vùng Sales
             }
             response.sendRedirect(request.getContextPath() + "/?error=unauthorized");
             return false;

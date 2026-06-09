@@ -9,12 +9,12 @@ public class ProductRowResponse {
     private String categoryName;
     private BigDecimal price;
     private String unit;
-    private Double stock;
+    private BigDecimal stock;
     private String status;
 
     // CONSTRUCTOR BẮT BUỘC: Thứ tự tham số phải chuẩn đét để Spring Data JPA mapping từ câu Query
     public ProductRowResponse(Integer productId, String productName, String imageUrl, String categoryName,
-                              BigDecimal price, String unit, Double stock, String status) {
+                              BigDecimal price, String unit, BigDecimal stock, String status) {
         this.productId = productId;
         this.productName = productName;
         this.imageUrl = imageUrl;
@@ -44,8 +44,8 @@ public class ProductRowResponse {
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }
 
-    public Double getStock() { return stock; }
-    public void setStock(Double stock) { this.stock = stock; }
+    public BigDecimal getStock() { return stock; }
+    public void setStock(BigDecimal stock) { this.stock = stock; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

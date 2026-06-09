@@ -111,6 +111,22 @@ public class UserServiceImpl implements UserService {
         String phone = trim(request.getPhone());
         String password = trim(request.getPassword());
 
+        // ⬇️ CHÈN NGAY ĐOẠN CODE DEBUG NÀY VÀO ĐỂ XEM SỰ THẬT ⬇️
+        System.out.println("=========================================");
+        System.out.println(">>> [DEBUG LOGIN] SĐT từ Form gửi lên: [" + phone + "]");
+        System.out.println(">>> [DEBUG LOGIN] Mật khẩu từ Form gửi lên: [" + password + "]");
+
+        java.util.Optional<User> testUser = userRepository.findByPhone(phone);
+        if (testUser.isPresent()) {
+            System.out.println(">>> [DEBUG LOGIN] -> ĐÃ TÌM THẤY USER TRONG DB TRÊN JAVA!");
+            System.out.println(">>> [DEBUG LOGIN] -> Chuỗi Hash trong DB đang là: [" + testUser.get().getPasswordHash() + "]");
+            boolean match = passwordEncoder.matches(password, testUser.get().getPasswordHash());
+            System.out.println(">>> [DEBUG LOGIN] -> Kết quả so khớp BCrypt: " + match);
+        } else {
+            System.out.println(">>> [DEBUG LOGIN] -> KHÔNG TÌM THẤY USER NÀO CÓ SĐT NÀY TRONG DB HỆ THỐNG ĐANG CHẠY!");
+        }
+        System.out.println("=========================================");
+
         if (phone.isEmpty()) {
             throw new LoginException("SDT không được để trống!");
         }
@@ -120,6 +136,14 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new LoginException("Số điện thoại hoặc mật khẩu không chính xác."));
+
+        // ⬇️ CHÈN THÊM ĐOẠN NÀY ĐỂ BỎ QUA KIỂM TRA MÃ HÓA CHO TÀI KHOẢN ADMIN LOCAL ⬇️
+//        if ("0962021899".equals(phone) && "123456".equals(password)) {
+//            if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) { //
+//                throw new LoginException("Tài khoản của bạn đã bị khóa hoặc chưa kích hoạt."); //
+//            }
+//            return user; // Cho qua thẳng luôn, không so khớp BCrypt nữa!
+//        }
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new LoginException("Số điện thoại hoặc mật khẩu không chính xác.");

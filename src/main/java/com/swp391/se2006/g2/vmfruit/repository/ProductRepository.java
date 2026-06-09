@@ -30,11 +30,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
                         Pageable pageable);
 
         @Query("SELECT new com.swp391.se2006.g2.vmfruit.dto.response.ProductRowResponse(" +
-                        "p.productId, p.productName, p.imageUrl, p.category.categoryName, p.basePrice, p.unit, " +
-                        "COALESCE(SUM(CAST(bi.remainingQuantity AS double)), 0.0), p.sellingStatus) " +
-                        "FROM Product p " +
-                        "LEFT JOIN InboundBatchItem bi ON bi.product.productId = p.productId AND bi.itemStatus = 'ACTIVE' "
-                        +
-                        "GROUP BY p.productId, p.productName, p.imageUrl, p.category.categoryName, p.basePrice, p.unit, p.sellingStatus")
+                "p.productId, p.productName, p.imageUrl, p.category.categoryName, p.basePrice, p.unit, " +
+                "COALESCE(SUM(bi.remainingQuantity), 0.0), p.sellingStatus) " + // Đã bỏ CAST AS double
+                "FROM Product p " +
+                "LEFT JOIN InboundBatchItem bi ON bi.product.productId = p.productId AND bi.itemStatus = 'ACTIVE' " +
+                "GROUP BY p.productId, p.productName, p.imageUrl, p.category.categoryName, p.basePrice, p.unit, p.sellingStatus")
         List<ProductRowResponse> getAllProductRowsForAdmin();
 }

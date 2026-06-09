@@ -22,7 +22,7 @@ public class AdminProductImpl implements AdminProductService {
 
     @Override
     public ProductStatsResponse getProductStats() {
-        long lowStock = inboundBatchItemsRepository.countByItemStatusAndRemainingQuantityLessThanEqual("ACTIVE", 5.0);
+        long lowStock = inboundBatchItemsRepository.countByItemStatusAndRemainingQuantityLessThanEqual("ACTIVE", new java.math.BigDecimal("5.0"));
 
         LocalDate today = LocalDate.now();
         LocalDate threeDaysLater = today.plusDays(3);
