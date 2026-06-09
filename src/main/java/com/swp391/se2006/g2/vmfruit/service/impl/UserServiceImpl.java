@@ -177,6 +177,7 @@ public class UserServiceImpl implements UserService {
         return userRoleRepository.existsByUserUserIdAndRoleRoleName(userId, "ADMIN");
     }
 
+
     private static String trim(String value) {
         return value == null ? "" : value.trim();
     }

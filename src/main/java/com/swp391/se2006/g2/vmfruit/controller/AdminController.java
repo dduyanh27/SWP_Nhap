@@ -65,12 +65,12 @@ public class AdminController {
         return "layouts/admin-layout";
     }
 
-    @GetMapping("/users")
-    public String showUsers(Model model) {
-        model.addAttribute("contentPage", "admin/users");
-        model.addAttribute("activeMenu", "user-manage");
-        return "layouts/admin-layout";
-    }
+//    @GetMapping("/users")
+//    public String showUsers(Model model) {
+//        model.addAttribute("contentPage", "admin/users");
+//        model.addAttribute("activeMenu", "user-manage");
+//        return "layouts/admin-layout";
+//    }
 
     @GetMapping("/batches")
     public String showBatchManagement(Model model) {
@@ -104,6 +104,11 @@ public class AdminController {
         model.addAttribute("contentPage", "admin/discounts");
         model.addAttribute("activeMenu", "discount-code");
         return "layouts/admin-layout";
+    }
+
+    @GetMapping("/import-receipts")
+    public String showImportReceiptManagement() {
+        return "admin-import-receipt";
     }
 
     @GetMapping("/payments")

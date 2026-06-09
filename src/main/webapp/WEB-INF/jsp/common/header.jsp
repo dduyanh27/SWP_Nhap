@@ -50,15 +50,17 @@
                         </a>
                     </div>
 
-                    <div class="search-bar">
-                        <input type="text" class="search-input" placeholder="Bạn cần tìm kiếm gì?..." />
-                        <button type="button" class="search-button">
+                    <div class="search-bar" id="headerSearchBox" style="position:relative;">
+                        <input type="text" id="headerSearchInput" class="search-input"
+                               placeholder="Bạn cần tìm kiếm gì?..." autocomplete="off" />
+                        <button type="button" id="headerSearchBtn" class="search-button">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
+                        <ul id="searchSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;margin:8px 0 0;padding:0;list-style:none;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.1);z-index:999;max-height:360px;overflow-y:auto;"></ul>
                     </div>
 
                     <div class="cart-info">
@@ -87,3 +89,84 @@
                         class="nav-link ${param.activePage == 'promotions' ? 'active' : ''}">Khuyến mãi</a>
                 </nav>
             </header>
+
+            <script id="searchProductsData" type="application/json">${searchProductsJson}</script>
+            <script>
+                (function () {
+                    const CTX = '${pageContext.request.contextPath}';
+                    const input = document.getElementById('headerSearchInput');
+                    const box = document.getElementById('headerSearchBox');
+                    const list = document.getElementById('searchSuggestions');
+                    if (!input || !list) return;
+
+                    let allProducts = [];
+                    try {
+                        const dataEl = document.getElementById('searchProductsData');
+                        allProducts = JSON.parse(dataEl ? dataEl.textContent : '[]') || [];
+                    } catch (e) {
+                        allProducts = [];
+                    }
+
+                    let debounceTimer = null;
+
+                    function formatPrice(value) {
+                        return Number(value).toLocaleString('vi-VN') + 'đ';
+                    }
+
+                    function hideSuggestions() {
+                        list.style.display = 'none';
+                        list.innerHTML = '';
+                    }
+
+                    function renderSuggestions(items) {
+                        list.innerHTML = '';
+                        if (!items.length) {
+                            list.innerHTML = '<li style="padding:12px 16px;color:#64748b;">Không tìm thấy sản phẩm</li>';
+                            list.style.display = 'block';
+                            return;
+                        }
+                        items.forEach(function (item) {
+                            const li = document.createElement('li');
+                            li.style.cssText = 'display:flex;justify-content:space-between;gap:12px;padding:10px 16px;cursor:pointer;';
+                            li.onmouseenter = function () { li.style.background = '#f8fafc'; };
+                            li.onmouseleave = function () { li.style.background = ''; };
+                            li.innerHTML =
+                                '<span>' + item.productName + '</span>' +
+                                '<span style="color:#00a88f;font-weight:600;">' + formatPrice(item.basePrice) + '</span>';
+                            li.addEventListener('mousedown', function (e) {
+                                e.preventDefault();
+                                window.location.href = CTX + '/products/' + item.productId;
+                            });
+                            list.appendChild(li);
+                        });
+                        list.style.display = 'block';
+                    }
+
+                    function filterSuggestions(term) {
+                        const q = term.trim().toLowerCase();
+                        if (!q) {
+                            hideSuggestions();
+                            return;
+                        }
+                        const matches = allProducts.filter(function (item) {
+                            return item.productName && item.productName.toLowerCase().includes(q);
+                        });
+                        renderSuggestions(matches);
+                    }
+
+                    input.addEventListener('input', function () {
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(function () {
+                            filterSuggestions(input.value);
+                        }, 150);
+                    });
+
+                    input.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') hideSuggestions();
+                    });
+
+                    document.addEventListener('click', function (e) {
+                        if (!box.contains(e.target)) hideSuggestions();
+                    });
+                })();
+            </script>

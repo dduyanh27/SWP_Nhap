@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "DiscountCodes")
@@ -16,33 +16,48 @@ public class DiscountCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "discount_code_id")
-    private Integer discountCodeId;
+    @Column(name = "discount_id")
+    private Integer discountId;
 
-    @Column(name = "code", nullable = false, unique = true, length = 50)
+    @Column(name = "code", nullable = false, unique = true, length = 20)
     private String code;
 
-    @Column(name = "description", length = 255)
-    private String description;
+    @Column(name = "min_order_amount", nullable = false, precision = 18, scale = 2)
+    private BigDecimal minOrderAmount = BigDecimal.ZERO;
 
-    @Column(name = "discount_percent", nullable = false, precision = 5, scale = 2)
-    private BigDecimal discountPercent;
+    @Column(name = "discount_value", nullable = false, precision = 18, scale = 2)
+    private BigDecimal discountValue;
+
+    @Column(name = "max_discount_amount", precision = 18, scale = 2)
+    private BigDecimal maxDiscountAmount;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
+    private LocalDateTime endDate;
+
+    @Column(name = "usage_limit")
+    private Integer usageLimit;
+
+    @Column(name = "used_count", nullable = false)
+    private Integer usedCount = 0;
+
+    @Column(name = "per_user_limit")
+    private Integer perUserLimit;
+
+    @Column(name = "target_user_type", nullable = false, length = 30)
+    private String targetUserType = "ALL";
 
     @Column(name = "status", nullable = false, length = 20)
     private String status = "ACTIVE";
 
-    public Integer getDiscountCodeId() {
-        return discountCodeId;
+    public Integer getDiscountId() {
+        return discountId;
     }
 
-    public void setDiscountCodeId(Integer discountCodeId) {
-        this.discountCodeId = discountCodeId;
+    public void setDiscountId(Integer discountId) {
+        this.discountId = discountId;
     }
 
     public String getCode() {
@@ -53,36 +68,76 @@ public class DiscountCode {
         this.code = code;
     }
 
-    public String getDescription() {
-        return description;
+    public BigDecimal getMinOrderAmount() {
+        return minOrderAmount;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setMinOrderAmount(BigDecimal minOrderAmount) {
+        this.minOrderAmount = minOrderAmount;
     }
 
-    public BigDecimal getDiscountPercent() {
-        return discountPercent;
+    public BigDecimal getDiscountValue() {
+        return discountValue;
     }
 
-    public void setDiscountPercent(BigDecimal discountPercent) {
-        this.discountPercent = discountPercent;
+    public void setDiscountValue(BigDecimal discountValue) {
+        this.discountValue = discountValue;
     }
 
-    public LocalDate getStartDate() {
+    public BigDecimal getMaxDiscountAmount() {
+        return maxDiscountAmount;
+    }
+
+    public void setMaxDiscountAmount(BigDecimal maxDiscountAmount) {
+        this.maxDiscountAmount = maxDiscountAmount;
+    }
+
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
+    }
+
+    public Integer getUsageLimit() {
+        return usageLimit;
+    }
+
+    public void setUsageLimit(Integer usageLimit) {
+        this.usageLimit = usageLimit;
+    }
+
+    public Integer getUsedCount() {
+        return usedCount;
+    }
+
+    public void setUsedCount(Integer usedCount) {
+        this.usedCount = usedCount;
+    }
+
+    public Integer getPerUserLimit() {
+        return perUserLimit;
+    }
+
+    public void setPerUserLimit(Integer perUserLimit) {
+        this.perUserLimit = perUserLimit;
+    }
+
+    public String getTargetUserType() {
+        return targetUserType;
+    }
+
+    public void setTargetUserType(String targetUserType) {
+        this.targetUserType = targetUserType;
     }
 
     public String getStatus() {

@@ -49,6 +49,10 @@
            class="sidebar-nav-item ${param.activeMenu == 'report-manage' ? 'active' : ''}">
             Report Manage
         </a>
+        <a href="${pageContext.request.contextPath}/admin/import-receipts"
+           class="sidebar-nav-item ${param.activeMenu == 'import-receipt-manage' ? 'active' : ''}">
+            Import Receipt Manage
+        </a>
     </nav>
 
     <div class="sidebar-footer">

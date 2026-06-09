@@ -183,6 +183,7 @@ a {
     font-size: 0.9rem;
     color: #94a3b8;
     margin-bottom: 24px;
+    letter-spacing: -0.3px;
 }
 
 /* ===================================================================
@@ -193,6 +194,10 @@ a {
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     margin-bottom: 28px;
+}
+
+.stat-cards-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
 }
 
 .stat-card {
@@ -233,6 +238,18 @@ a {
     font-weight: 900;
     color: #0f172a;
     line-height: 1;
+}
+
+.stat-card-value.stat-value-warning {
+    color: #ed8936;
+}
+
+.stat-card-value.stat-value-success {
+    color: #48bb78;
+}
+
+.stat-card-value.stat-value-info {
+    color: #3182ce;
 }
 
 /* ===================================================================
@@ -425,6 +442,10 @@ a {
     margin-bottom: 24px;
 }
 
+.admin-toolbar .btn-add-product {
+    margin-left: auto;
+}
+
 .admin-toolbar .toolbar-left {
     display: flex;
     gap: 12px;
@@ -452,6 +473,16 @@ a {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+}
+
+.role-form {
+    margin: 0;
+}
+
+.admin-select-inline {
+    min-width: 120px;
+    padding: 6px 28px 6px 10px;
+    font-size: 13px;
 }
 
 .btn-add-product {
@@ -582,6 +613,35 @@ a {
     color: #64748b;
 }
 
+.status-badge.received {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.pending {
+    background-color: #ffedd5;
+    color: #c2410c;
+}
+
+.import-id {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* User status text (Figma style) */
+.status-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-text.active {
+    color: #16a34a;
+}
+
+.status-text.inactive {
+    color: #dc2626;
+}
+
 /* Action links */
 .action-links {
     display: flex;
@@ -615,12 +675,33 @@ a {
     text-decoration: underline;
 }
 
+.action-link.lock,
+.action-link.unlock,
+.action-link.view-history {
+    color: #3b82f6;
+}
+
+.action-link.lock:hover,
+.action-link.unlock:hover,
+.action-link.view-history:hover,
+.action-link.cancel:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.action-link.cancel {
+    color: #3b82f6;
+}
+
 .action-sep {
     color: #cbd5e1;
     margin: 0 4px;
     font-weight: 300;
 }
 
+/* ===================================================================
+   EMPTY STATE
+   =================================================================== */
 .table-empty {
     text-align: center;
     padding: 60px 20px;
@@ -629,11 +710,105 @@ a {
 }
 
 /* ===================================================================
+   ADMIN FORM & ALERTS
+   =================================================================== */
+.admin-page-subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: -12px 0 24px;
+}
+
+.admin-alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.admin-alert.success {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.admin-alert.error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.admin-form-card {
+    background: #ffffff;
+    border: 1px solid #e8ecf0;
+    border-radius: 12px;
+    padding: 28px;
+    max-width: 560px;
+}
+
+.admin-form-group {
+    margin-bottom: 18px;
+}
+
+.admin-form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.admin-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #334155;
+    background: #f8fafc;
+}
+
+.admin-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    background: #ffffff;
+}
+
+.admin-form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-admin-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.btn-admin-secondary:hover {
+    background: #f8fafc;
+}
+
+/* ===================================================================
    RESPONSIVE
    =================================================================== */
 @media (max-width: 1200px) {
-    .charts-row { grid-template-columns: 1fr; }
-    .stat-cards-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-cards-grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 @media (max-width: 900px) {

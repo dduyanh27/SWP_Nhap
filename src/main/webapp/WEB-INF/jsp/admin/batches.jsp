@@ -2,13 +2,47 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<div class="admin-table-wrapper">
-    <h2 style="margin: 20px; color: #0F172A; font-family: sans-serif;">Batch Management</h2>
+<h1 class="admin-page-title">Batch Management</h1>
 
+<div class="stat-cards-grid">
+    <div class="stat-card">
+        <div class="stat-card-label">Active Batches</div>
+        <div class="stat-card-value">${activeBatchesCount != null ? activeBatchesCount : '0'}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-label">Expiring Batches</div>
+        <div class="stat-card-value" style="color: #EF4444;">${expiringBatchesCount != null ? expiringBatchesCount : '0'}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-label">Liquidated Lots</div>
+        <div class="stat-card-value">${liquidatedLotsCount != null ? liquidatedLotsCount : '0'}</div>
+    </div>
+</div>
+
+<div class="admin-toolbar">
+    <div class="toolbar-left">
+        <select id="statusSelect" name="status" class="admin-select" onchange="applyBatchFilters()">
+            <option value=""          ${param.status == '' ? 'selected' : ''}>PO Status (All)</option>
+            <option value="ACTIVE"    ${param.status == 'ACTIVE' ? 'selected' : ''}>Active</option>
+            <option value="COMPLETED" ${param.status == 'COMPLETED' ? 'selected' : ''}>Completed</option>
+        </select>
+
+        <select id="supplierFilter" name="supplier" class="admin-select" onchange="applyBatchFilters()">
+            <option value="">Filter by Supplier</option>
+            </select>
+    </div>
+
+    <a href="${pageContext.request.contextPath}/admin/batches/new" class="btn-add-product">
+        + Receive New Batch
+    </a>
+</div>
+
+<div class="admin-table-wrapper">
     <table class="admin-table">
         <thead>
             <tr>
-                <th style="width: 4%;"></th> <th style="width: 14%;">Mã Lô / PO ID</th>
+                <th style="width: 4%;"></th>
+                <th style="width: 14%;">Mã Lô / PO ID</th>
                 <th style="width: 32%;">Thông tin Sản phẩm / Đợt nhập</th>
                 <th style="width: 15%;">Giá nhập (Unit Cost)</th>
                 <th style="width: 15%;">Tồn kho thực tế</th>
@@ -34,11 +68,16 @@
 
                 <c:forEach var="child" items="${parent.batchItems}">
                     <tr class="child-of-${parent.batchId}" style="display: none; background-color: #F8FAFC;">
-                        <td></td> <td style="color: #94A3B8; font-size: 0.8rem; padding-left: 15px;">
+                        <td></td>
+                        <td style="color: #94A3B8; font-size: 0.8rem; padding-left: 15px;">
                             └── IT${String.format("%04d", child.batchItemId)}
                         </td>
-                        <td style="font-weight: 600; color: #334155;">${child.productName}</td>
-                        <td style="color: #475569;"><fmt:formatNumber value="${child.importPrice}" type="currency" currencySymbol="đ" maxFractionDigits="0"/></td>
+                        <td style="font-weight: 600; color: #334155; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${child.productName}">
+                            ${child.productName}
+                        </td>
+                        <td style="color: #475569;">
+                            <fmt:formatNumber value="${child.importPrice}" type="currency" currencySymbol="đ" maxFractionDigits="0"/>
+                        </td>
                         <td style="font-weight: 600; color: #0F172A;">
                             ${child.remainingQuantity} / ${child.acceptedQuantity} ${child.unit}
                         </td>
@@ -89,5 +128,11 @@ function toggleChildRows(batchId) {
             icon.style.color = '#64748B';
         }
     });
+}
+
+function applyBatchFilters() {
+    const status = document.getElementById('statusSelect').value;
+    const base = window.location.pathname;
+    window.location.href = base + '?status=' + encodeURIComponent(status);
 }
 </script>

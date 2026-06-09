@@ -45,8 +45,9 @@ public class Order {
     @Column(name = "shipping_fee", nullable = false, precision = 18, scale = 2)
     private BigDecimal shippingFee = BigDecimal.ZERO;
 
-    @Column(name = "discount_amount", nullable = false, precision = 18, scale = 2)
-    private BigDecimal discountAmount = BigDecimal.ZERO;
+    @ManyToOne
+    @JoinColumn(name = "discount_id")
+    private DiscountCode discount;
 
     @Column(name = "total_amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;
@@ -135,12 +136,12 @@ public class Order {
         this.shippingFee = shippingFee;
     }
 
-    public BigDecimal getDiscountAmount() {
-        return discountAmount;
+    public DiscountCode getDiscount() {
+        return discount;
     }
 
-    public void setDiscountAmount(BigDecimal discountAmount) {
-        this.discountAmount = discountAmount;
+    public void setDiscount(DiscountCode discount) {
+        this.discount = discount;
     }
 
     public BigDecimal getTotalAmount() {

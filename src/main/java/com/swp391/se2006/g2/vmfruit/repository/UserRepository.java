@@ -4,9 +4,12 @@ import com.swp391.se2006.g2.vmfruit.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
+
+    List<User> findAllByOrderByUserIdAsc();
 
     boolean existsByEmailIgnoreCase(String email);
 
@@ -19,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
 
     List<User> findTop5ByOrderByCreatedAtDesc();
+
+    long countByCreatedAtGreaterThanEqual(LocalDateTime fromDate);
 }
