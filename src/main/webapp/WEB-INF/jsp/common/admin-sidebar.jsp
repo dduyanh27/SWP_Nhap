@@ -25,6 +25,10 @@
            class="sidebar-nav-item ${param.activeMenu == 'fruit-manage' ? 'active' : ''}">
             Fruit Manage
         </a>
+        <a href="${pageContext.request.contextPath}/admin/batches"
+                   class="sidebar-nav-item ${param.activeMenu == 'batch-manage' ? 'active' : ''}">
+                    Batch Manage
+        </a>
         <a href="${pageContext.request.contextPath}/admin/orders"
            class="sidebar-nav-item ${param.activeMenu == 'order-manage' ? 'active' : ''}">
             Order Manage

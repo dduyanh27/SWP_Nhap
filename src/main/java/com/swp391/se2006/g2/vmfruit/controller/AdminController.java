@@ -1,8 +1,10 @@
 package com.swp391.se2006.g2.vmfruit.controller;
 
+import com.swp391.se2006.g2.vmfruit.dto.response.BatchStatsResponse;
 import com.swp391.se2006.g2.vmfruit.dto.response.ProductRowResponse;
 import com.swp391.se2006.g2.vmfruit.dto.response.ProductStatsResponse;
 import com.swp391.se2006.g2.vmfruit.entity.User;
+import com.swp391.se2006.g2.vmfruit.service.AdminBatchService;
 import com.swp391.se2006.g2.vmfruit.service.AdminProductService;
 import com.swp391.se2006.g2.vmfruit.service.AdminService;
 import com.swp391.se2006.g2.vmfruit.service.UserService;
@@ -22,11 +24,13 @@ public class AdminController {
     private final AdminService adminService;
     private final AdminProductService adminProductService;
     private final UserService userService;
+    private final com.swp391.se2006.g2.vmfruit.service.AdminBatchService adminBatchService;
 
-    public AdminController(AdminService adminService, AdminProductService adminProductService, UserService userService) {
+    public AdminController(AdminService adminService, AdminProductService adminProductService, UserService userService, AdminBatchService adminBatchService) {
         this.adminService = adminService;
         this.adminProductService = adminProductService;
         this.userService = userService;
+        this.adminBatchService = adminBatchService;
     }
 
     @GetMapping("/dashboard")
@@ -65,6 +69,19 @@ public class AdminController {
     public String showUsers(Model model) {
         model.addAttribute("contentPage", "admin/users");
         model.addAttribute("activeMenu", "user-manage");
+        return "layouts/admin-layout";
+    }
+
+    @GetMapping("/batches")
+    public String showBatchManagement(Model model) {
+        BatchStatsResponse stats = adminBatchService.getBatchStats();
+        model.addAttribute("activeBatchesCount", stats.getActiveBatchesCount());
+        model.addAttribute("expiringBatchesCount", stats.getExpiringBatchesCount());
+        model.addAttribute("liquidatedLotsCount", stats.getLiquidatedLotsCount());
+        List<com.swp391.se2006.g2.vmfruit.dto.response.BatchGroupResponse> batchList = adminBatchService.getBatchManagementData();
+        model.addAttribute("batchGroups", batchList);
+        model.addAttribute("contentPage", "admin/batches");
+        model.addAttribute("activeMenu", "batch-manage");
         return "layouts/admin-layout";
     }
 
