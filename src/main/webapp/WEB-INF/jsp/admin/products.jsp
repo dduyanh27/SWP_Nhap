@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-        <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
             <h1 class="admin-page-title">Fruit Management</h1>
 
@@ -56,10 +57,10 @@
                     <thead>
                         <tr>
                             <th style="width: 10%;">Mã SP</th>
-                            <th style="width: 40%;">Sản phẩm</th>
+                            <th style="width: 33%;">Sản phẩm</th>
                             <th style="width: 20%;">Giá cơ sở</th>
                             <th style="width: 12%;">Tổng kho</th>
-                            <th style="width: 18%;">Trạng thái</th>
+                            <th style="width: 13%;">Trạng thái</th>
                             <th style="text-align:right;">Hành động</th>
                         </tr>
                     </thead>
@@ -74,36 +75,32 @@
                                         </td>
                                         <td>
                                             <div class="product-info-cell">
-                                                <img src="${not empty p.imageUrl ? p.imageUrl : pageContext.request.contextPath+'/css/default-fruit.png'}"
+                                                <img src="${fn:escapeXml(not empty p.imageUrl ? p.imageUrl : '/css/default-fruit.png')}"
                                                     alt="fruit" class="product-img" />
                                                 <div class="product-details">
-                                                    <span class="product-name">${p.productName}</span>
-                                                    <span class="product-category">Danh mục: ${p.categoryName}</span>
+                                                    <span class="product-name">${fn:escapeXml(p.productName)}</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <c:choose>
-                                                <c:when test="${not empty p.price}">
-                                                    <fmt:formatNumber value="${p.price}" type="number"
+                                                <c:when test="${not empty p.basePrice}">
+                                                    <fmt:formatNumber value="${p.basePrice}" type="number"
                                                         groupingUsed="true" />
                                                 </c:when>
                                                 <c:otherwise>0</c:otherwise>
-                                            </c:choose>đ / ${p.unit}
+                                            </c:choose>đ / ${fn:escapeXml(p.unit)}
                                         </td>
                                         <td class="product-name">
-                                            <fmt:formatNumber value="${p.stock}" maxFractionDigits="0" />
+                                            <fmt:formatNumber value="${p.stock}" maxFractionDigits="2" />
                                         </td>
                                         <td>
                                             <c:choose>
                                                 <c:when test="${p.status == 'INACTIVE' || p.status == 'hidden'}">
                                                     <span class="status-badge hidden">Hidden</span>
                                                 </c:when>
-                                                <c:when test="${p.stock > 0 && p.stock <= 5}">
-                                                    <span class="status-badge low-stock">Low Stock</span>
-                                                </c:when>
                                                 <c:otherwise>
-                                                    <span class="status-badge normal">Normal</span>
+                                                    <span class="status-badge normal">Active</span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
@@ -112,9 +109,16 @@
                                                 <a href="${pageContext.request.contextPath}/admin/products/edit?id=${p.productId}"
                                                     class="action-link edit">Edit</a>
                                                 <span class="action-sep">|</span>
-                                                <a href="${pageContext.request.contextPath}/admin/products/hide?id=${p.productId}"
-                                                    class="action-link hide"
-                                                    onclick="return confirm('Ẩn sản phẩm này khỏi cửa hàng?')">Hide</a>
+                                                <c:choose>
+                                                    <c:when test="${p.status == 'INACTIVE'}">
+                                                        <a href="${pageContext.request.contextPath}/admin/products/toggle?id=${p.productId}"
+                                                           class="action-link unhide">Unhide</a>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <a href="${pageContext.request.contextPath}/admin/products/toggle?id=${p.productId}"
+                                                           class="action-link hide">Hide</a>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
                                         </td>
                                     </tr>
@@ -128,13 +132,11 @@
                                             <div class="product-img" style="background: #FEF3C7;"></div>
                                             <div class="product-details">
                                                 <span class="product-name">Táo Rockit New Zealand</span>
-                                                <span class="product-category">Danh mục: Trái cây nhập khẩu</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td>400.000đ / Hộp</td>
-                                    <td class="product-name">50</td>
-                                    <td><span class="status-badge normal">Normal</span></td>
+                                    <td><span class="status-badge normal">Active</span></td>
                                     <td style="text-align:right;">
                                         <div class="action-links" style="justify-content:flex-end;">
                                             <a href="#" class="action-link edit">Edit</a>
@@ -150,6 +152,30 @@
             </div>
 
             <script>
+                const CTX = '${pageContext.request.contextPath}';
+
+                async function toggleStatus(productId, action) {
+                    const msg = action === 'hide'
+                        ? 'Ẩn sản phẩm này khỏi cửa hàng?'
+                        : 'Hiện lại sản phẩm này lên cửa hàng?';
+                    if (!confirm(msg)) return;
+
+                    try {
+                        const res = await fetch(CTX + '/admin/products/' + productId + '/toggle-status', {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            alert('Lỗi: ' + (data.message || 'Không thể thực hiện.'));
+                        }
+                    } catch (err) {
+                        alert('Lỗi kết nối server!');
+                    }
+                }
+
                 function applyFilters() {
                     const sort = document.getElementById('sortSelect').value;
                     const price = document.getElementById('priceFilter').value;

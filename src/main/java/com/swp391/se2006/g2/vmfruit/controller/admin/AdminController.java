@@ -60,7 +60,6 @@ public class AdminController {
         return "layouts/admin-layout";
     }
 
-    // ── Danh sách sản phẩm ──────────────────────────────────────────────
     @GetMapping("/products")
     public String showProductManagement(Model model) {
         ProductStatsResponse stats = adminProductService.getProductStats();
@@ -87,6 +86,15 @@ public class AdminController {
         model.addAttribute("contentPage", "admin/nproducts");
         model.addAttribute("activeMenu", "fruit-manage");
         return "layouts/admin-layout";
+    }
+
+    // ── Toggle ẩn/hiện sản phẩm (không dùng JS, chỉ dùng GET redirect) ──
+    @GetMapping("/products/toggle")
+    public String toggleProductStatus(@RequestParam("id") Integer id) {
+        try {
+            adminProductService.toggleProductStatus(id);
+        } catch (Exception ignored) {}
+        return "redirect:/admin/products";
     }
 
     // ── Trang chỉnh sửa sản phẩm ────────────────────────────────────────

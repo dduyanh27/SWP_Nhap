@@ -10,6 +10,8 @@ import com.swp391.se2006.g2.vmfruit.repository.CategoryRepository;
 import com.swp391.se2006.g2.vmfruit.repository.InboundBatchItemsRepository;
 import com.swp391.se2006.g2.vmfruit.repository.ProductRepository;
 import com.swp391.se2006.g2.vmfruit.service.AdminProductService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,9 @@ import java.util.List;
 
 @Service
 public class AdminProductImpl implements AdminProductService {
+
+    @PersistenceContext
+    private EntityManager em;
 
     private final ProductRepository productRepository;
     private final InboundBatchItemsRepository inboundBatchItemsRepository;
@@ -86,15 +91,20 @@ public class AdminProductImpl implements AdminProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Product getProductById(Integer productId) {
-        return productRepository.findById(productId)
+        Product p = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm id=" + productId));
+        // Eagerly initialize lazy collection để tránh LazyInitializationException bên ngoài transaction
+        p.getProductCategories().size();
+        return p;
     }
 
     @Override
     @Transactional
     public Product updateProduct(ProductRequest request) {
-        Product product = getProductById(request.getProductId());
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm id=" + request.getProductId()));
 
         product.setProductName(request.getProductName());
         product.setDescription(request.getDescription());
@@ -106,10 +116,11 @@ public class AdminProductImpl implements AdminProductService {
             product.setSellingStatus(request.getSellingStatus());
         }
 
-        // Cập nhật danh mục: xoá toàn bộ cũ, thêm mới theo list
+        // Xoá toàn bộ category cũ, flush ngay để orphanRemoval DELETE chạy trước
         product.getProductCategories().clear();
-        productRepository.save(product); // flush để xoá orphan trước
+        em.flush();
 
+        // Thêm các category mới
         if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             for (Integer catId : request.getCategoryIds()) {
                 categoryRepository.findById(catId).ifPresent(cat -> {

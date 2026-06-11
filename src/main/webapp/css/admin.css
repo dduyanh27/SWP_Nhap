@@ -675,6 +675,15 @@ a {
     text-decoration: underline;
 }
 
+.action-link.unhide {
+    color: #10b981;
+}
+
+.action-link.unhide:hover {
+    color: #059669;
+    text-decoration: underline;
+}
+
 .action-link.lock,
 .action-link.unlock,
 .action-link.view-history {

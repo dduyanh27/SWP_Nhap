@@ -34,12 +34,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             Pageable pageable);
 
     @Query("SELECT new com.swp391.se2006.g2.vmfruit.dto.response.ProductRowResponse(" +
-            "p.productId, p.productName, p.imageUrl, MIN(c.categoryName), p.basePrice, p.unit, " +
-            "SUM(bi.remainingQuantity), p.sellingStatus) " +
+            "p.productId, p.productName, p.imageUrl, p.basePrice, p.unit, " +
+            "SUM(CASE WHEN bi.itemStatus = 'ACTIVE' AND bi.expiryDate >= CURRENT_DATE THEN bi.remainingQuantity ELSE 0 END), " +
+            "p.sellingStatus) " +
             "FROM Product p " +
-            "LEFT JOIN p.productCategories pc " +
-            "LEFT JOIN pc.category c " +
-            "LEFT JOIN InboundBatchItem bi ON bi.product.productId = p.productId AND bi.itemStatus = 'ACTIVE' " +
+            "LEFT JOIN InboundBatchItem bi ON bi.product.productId = p.productId " +
             "GROUP BY p.productId, p.productName, p.imageUrl, p.basePrice, p.unit, p.sellingStatus " +
             "ORDER BY p.productId ASC")
     List<ProductRowResponse> getAllProductRowsForAdmin();
