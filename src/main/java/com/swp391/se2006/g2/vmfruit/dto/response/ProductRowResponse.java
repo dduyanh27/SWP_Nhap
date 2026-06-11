@@ -18,10 +18,12 @@ public class ProductRowResponse {
         this.productId = productId;
         this.productName = productName;
         this.imageUrl = imageUrl;
-        this.categoryName = categoryName;
+        // MIN(categoryName) trả về null khi sản phẩm chưa có danh mục nào
+        this.categoryName = (categoryName != null) ? categoryName : "";
         this.price = price;
         this.unit = unit;
-        this.stock = stock;
+        // SUM(remainingQuantity) trả về null khi sản phẩm chưa có lô hàng nào
+        this.stock = (stock != null) ? stock : BigDecimal.ZERO;
         this.status = status;
     }
 

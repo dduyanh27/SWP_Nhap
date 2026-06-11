@@ -6,14 +6,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 public interface InboundBatchItemsRepository extends JpaRepository<InboundBatchItem, Integer> {
-    long countByItemStatusAndRemainingQuantityLessThanEqual(String itemStatus, java.math.BigDecimal threshold);
+    long countByItemStatusAndRemainingQuantityLessThanEqual(String itemStatus, BigDecimal threshold);
 
     @Query("SELECT COUNT(i) FROM InboundBatchItem i WHERE i.itemStatus = 'ACTIVE' AND i.expiryDate >= :today AND i.expiryDate <= :targetDate")
     long countExpiringSoonLotes(@Param("today") LocalDate today, @Param("targetDate") LocalDate targetDate);
+
+    @Query("SELECT COALESCE(SUM(bi.remainingQuantity), 0) FROM InboundBatchItem bi WHERE bi.product.productId = :productId AND bi.itemStatus = 'ACTIVE'")
+    BigDecimal getTotalRemainingQuantityByProductId(@Param("productId") Integer productId);
 
     @Query("SELECT new com.swp391.se2006.g2.vmfruit.dto.response.BatchItemResponse(" +
             "bi.batchItemId, bi.product.productName, bi.product.unit, bi.importDetail.importPrice, " +

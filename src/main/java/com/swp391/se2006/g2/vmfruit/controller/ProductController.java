@@ -2,6 +2,7 @@ package com.swp391.se2006.g2.vmfruit.controller;
 
 import com.swp391.se2006.g2.vmfruit.entity.Category;
 import com.swp391.se2006.g2.vmfruit.entity.Product;
+import com.swp391.se2006.g2.vmfruit.entity.Review;
 import com.swp391.se2006.g2.vmfruit.repository.CategoryRepository;
 import com.swp391.se2006.g2.vmfruit.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ProductController {
@@ -48,5 +50,27 @@ public class ProductController {
         model.addAttribute("sortDir", sortDir);
 
         return "product-list";
+    }
+
+    @GetMapping("/products/{productId}")
+    public String productDetail(@PathVariable Integer productId, Model model) {
+        Optional<Product> productOpt = productService.getProductById(productId);
+        if (productOpt.isEmpty()) {
+            return "redirect:/products";
+        }
+
+        Product product = productOpt.get();
+        Double stock = productService.getProductStock(productId);
+        List<Review> reviews = productService.getProductReviews(productId);
+        Double avgRating = productService.getAverageRating(productId);
+        long reviewCount = productService.getReviewCount(productId);
+
+        model.addAttribute("product", product);
+        model.addAttribute("stock", stock);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("avgRating", avgRating);
+        model.addAttribute("reviewCount", reviewCount);
+
+        return "product-detail";
     }
 }

@@ -19,6 +19,16 @@ public class User {
     @Column(name = "user_id")
     private Integer userId;
 
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
@@ -39,16 +49,21 @@ public class User {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
+    @Column(name="gender")
+    private String gender;
+    public String getGender() { return gender;}
     @Column(name = "avatar_url", length = 255)
     private String avatarUrl;
 
-    @Column(name = "gender", length = 10)
-    private String gender;
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
 
-    @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
-
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+    public void setGender(String gender){ this.gender=gender;}
+    
     public Integer getUserId() {
         return userId;
     }
@@ -113,27 +128,5 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
 }

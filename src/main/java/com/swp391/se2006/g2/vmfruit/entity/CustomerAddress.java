@@ -34,6 +34,10 @@ public class CustomerAddress {
     @Column(name = "is_default", nullable = false)
     private Boolean isDefault = false;
 
+    public static Object getAddressesByUserId(Integer currentUserId) {
+        return currentUserId;
+    }
+
     public Integer getAddressId() {
         return addressId;
     }

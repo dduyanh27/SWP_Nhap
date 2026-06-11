@@ -16,4 +16,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     BigDecimal sumTotalAmountByPaymentStatus(@Param("paymentStatus") String paymentStatus);
 
     List<Order> findTop5ByOrderByCreatedAtDesc();
+    List<Order> findByUser_UserId(Integer UserId);
+    long countByUser_UserIdAndOrderStatus(Integer userId, String orderStatus);
 }

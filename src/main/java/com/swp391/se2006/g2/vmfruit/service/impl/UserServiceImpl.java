@@ -17,6 +17,7 @@ import com.swp391.se2006.g2.vmfruit.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.swp391.se2006.g2.vmfruit.dto.request.UserRequest;
 
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
@@ -181,4 +182,50 @@ public class UserServiceImpl implements UserService {
     private static String trim(String value) {
         return value == null ? "" : value.trim();
     }
-}
+
+        @Override
+        public User getUserById(Integer userId) {
+            return userRepository.findById(userId).orElse(null);
+        }
+
+        @Override
+        public void updateUserProfile(Integer userId, UserRequest request, String avatarUrl) {
+            User existingUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+            existingUser.setFullName(request.getFullName());
+            existingUser.setDateOfBirth(request.getDateOfBirth());
+            existingUser.setGender(request.getGender());
+            existingUser.setPhone(request.getPhoneNumber());
+            existingUser.setUpdatedAt(LocalDateTime.now());
+
+            // Nếu avatarUrl truyền vào có giá trị thì mới cập nhật
+            if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                existingUser.setAvatarUrl(avatarUrl);
+            }
+
+            userRepository.save(existingUser);
+        }
+
+    @Override
+    @Transactional
+    public void changePassword(Integer userId, String oldPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+        if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
+            throw new RuntimeException("Mật khẩu cũ không chính xác!");
+        }
+        if (passwordEncoder.matches(newPassword, user.getPasswordHash())) {
+            throw new RuntimeException("Mật khẩu mới phải khác mật khẩu cũ!");
+        }
+
+        if (newPassword == null || newPassword.length() < 8) {
+            throw new RuntimeException("Mật khẩu mới phải có tối thiểu 8 ký tự!");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+    }
+
