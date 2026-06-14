@@ -179,6 +179,13 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
+    public boolean isSale(Integer userId) {
+        boolean result = userRoleRepository.existsByUserUserIdAndRoleRoleName(userId, "SALES_STAFF");
+        System.out.println(">>> [DEBUG isSale] userId=" + userId + ", result=" + result);
+        return result;
+    }
+
     private static String trim(String value) {
         return value == null ? "" : value.trim();
     }

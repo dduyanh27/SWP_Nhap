@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <jsp:include page="common/header.jsp">
     <jsp:param name="title" value="${product.productName} - VMFRUIT" />
@@ -25,7 +26,7 @@
             <div class="main-image">
                 <c:choose>
                     <c:when test="${not empty product.imageUrl}">
-                        <img src="${product.imageUrl}" alt="${product.productName}" />
+                        <img src="${pageContext.request.contextPath}/${product.imageUrl}" alt="${product.productName}" />
                     </c:when>
                     <c:otherwise>
                         <span class="placeholder">HÌNH ẢNH</span>
@@ -36,7 +37,7 @@
                 <button type="button" class="thumbnail-item active" aria-label="Xem hình sản phẩm 1">
                     <c:choose>
                         <c:when test="${not empty product.imageUrl}">
-                            <img src="${product.imageUrl}" alt="" />
+                            <img src="${pageContext.request.contextPath}/${product.imageUrl}" alt="" />
                         </c:when>
                         <c:otherwise>
                             <span style="font-size:10px;color:#94a3b8;">IMG</span>
@@ -112,7 +113,7 @@
             </div>
 
             <div class="action-buttons">
-                <button type="button" class="btn-add-cart">THÊM VÀO GIỎ</button>
+                <button type="button" class="btn-add-cart" data-product-id="${product.productId}">THÊM VÀO GIỎ</button>
                 <button type="button" class="btn-buy-now">MUA NGAY</button>
             </div>
         </div>
@@ -136,6 +137,94 @@
         </div>
     </section>
 
+    <section class="reviews-section">
+        <div class="reviews-container">
+            <h2 class="reviews-title">Đánh giá sản phẩm</h2>
+
+            <c:if test="${not empty reviewSuccess}">
+                <div class="review-alert review-alert-success">${reviewSuccess}</div>
+            </c:if>
+            <c:if test="${not empty reviewError}">
+                <div class="review-alert review-alert-error">${reviewError}</div>
+            </c:if>
+
+            <c:choose>
+                <c:when test="${canReview}">
+                    <div class="review-form-wrapper">
+                        <h3>Viết đánh giá của bạn</h3>
+                        <form action="${pageContext.request.contextPath}/products/${product.productId}/review" method="POST" class="review-form">
+                            <div class="rating-select">
+                                <span class="rating-label">Chất lượng sản phẩm:</span>
+                                <div class="star-rating">
+                                    <input type="radio" id="star5" name="rating" value="5" />
+                                    <label for="star5" title="5 sao">★</label>
+                                    <input type="radio" id="star4" name="rating" value="4" />
+                                    <label for="star4" title="4 sao">★</label>
+                                    <input type="radio" id="star3" name="rating" value="3" />
+                                    <label for="star3" title="3 sao">★</label>
+                                    <input type="radio" id="star2" name="rating" value="2" />
+                                    <label for="star2" title="2 sao">★</label>
+                                    <input type="radio" id="star1" name="rating" value="1" />
+                                    <label for="star1" title="1 sao">★</label>
+                                </div>
+                            </div>
+                            <textarea name="comment" class="review-textarea" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..." required></textarea>
+                            <button type="submit" class="btn-submit-review">GỬI ĐÁNH GIÁ</button>
+                        </form>
+                    </div>
+                </c:when>
+                <c:when test="${not isLoggedIn}">
+                    <div class="review-login-prompt">
+                        <p>Vui lòng <a href="${pageContext.request.contextPath}/login">đăng nhập</a> để viết đánh giá.</p>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="review-login-prompt">
+                        <p>Bạn đã đánh giá sản phẩm này rồi.</p>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+
+            <c:choose>
+                <c:when test="${not empty reviews and reviews.size() > 0}">
+                    <div class="reviews-list">
+                        <c:forEach var="review" items="${reviews}">
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer-avatar">
+                                        <c:choose>
+                                            <c:when test="${not empty review.user.avatarUrl}">
+                                                <img src="${pageContext.request.contextPath}/${review.user.avatarUrl}" alt="${review.user.fullName}" />
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="avatar-placeholder">${fn:substring(review.user.fullName, 0, 1)}</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                    <div class="reviewer-info">
+                                        <span class="reviewer-name">${review.user.fullName}</span>
+                                        <span class="review-date">${fn:substring(review.createdAt.toString(), 0, 10)}</span>
+                                    </div>
+                                    <div class="review-stars">
+                                        <c:forEach begin="1" end="5" var="i">
+                                            <c:choose>
+                                                <c:when test="${i <= review.rating}">★</c:when>
+                                                <c:otherwise><span class="empty">★</span></c:otherwise>
+                                            </c:choose>
+                                        </c:forEach>
+                                    </div>
+                                </div>
+                                <p class="review-comment">${review.comment}</p>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <p class="no-reviews">Chưa có đánh giá nào cho sản phẩm này.</p>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </section>
 </main>
 
 <script>
@@ -158,6 +247,35 @@ document.querySelectorAll('.tab-btn').forEach(function(btn) {
         this.classList.add('active');
         document.getElementById('tab-' + this.getAttribute('data-tab')).style.display = '';
     });
+});
+
+const isLoggedIn = ${ not empty sessionScope.currentUser };
+
+document.querySelector('.btn-add-cart').addEventListener('click', function(e) {
+    var productId = this.getAttribute('data-product-id');
+    var quantity = document.getElementById('productQty').value || 1;
+
+    if (!isLoggedIn) {
+        window.location.href = '${pageContext.request.contextPath}/login';
+        return;
+    }
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.style.display = 'none';
+    form.action = '${pageContext.request.contextPath}/cart/add';
+    var inputPid = document.createElement('input');
+    inputPid.type = 'hidden';
+    inputPid.name = 'productId';
+    inputPid.value = productId;
+    form.appendChild(inputPid);
+    var inputQty = document.createElement('input');
+    inputQty.type = 'hidden';
+    inputQty.name = 'quantity';
+    inputQty.value = quantity;
+    form.appendChild(inputQty);
+    document.body.appendChild(form);
+    form.submit();
 });
 </script>
 

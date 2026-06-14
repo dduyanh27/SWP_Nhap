@@ -75,7 +75,6 @@ public class AdminController {
         return "layouts/admin-layout";
     }
 
-    // ── Trang thêm sản phẩm mới ─────────────────────────────────────────
     @GetMapping("/products/new")
     public String showAddProduct(Model model) {
         List<Category> categories = categoryRepository.findAll()
@@ -88,7 +87,6 @@ public class AdminController {
         return "layouts/admin-layout";
     }
 
-    // ── Toggle ẩn/hiện sản phẩm (không dùng JS, chỉ dùng GET redirect) ──
     @GetMapping("/products/toggle")
     public String toggleProductStatus(@RequestParam("id") Integer id) {
         try {
@@ -97,13 +95,11 @@ public class AdminController {
         return "redirect:/admin/products";
     }
 
-    // ── Trang chỉnh sửa sản phẩm ────────────────────────────────────────
     @GetMapping("/products/edit")
     public String showEditProduct(@RequestParam("id") Integer id, Model model) {
         try {
             Product product = adminProductService.getProductById(id);
 
-            // Lấy danh sách tất cả categoryId của sản phẩm
             List<Integer> selectedCategoryIds = product.getProductCategories().stream()
                     .map(pc -> pc.getCategory().getCategoryId())
                     .collect(Collectors.toList());
@@ -146,23 +142,11 @@ public class AdminController {
         return "layouts/admin-layout";
     }
 
-    @GetMapping("/reviews")
-    public String showReviews(Model model) {
-        model.addAttribute("contentPage", "admin/reviews");
-        model.addAttribute("activeMenu", "review-manage");
-        return "layouts/admin-layout";
-    }
-
     @GetMapping("/discounts")
     public String showDiscounts(Model model) {
         model.addAttribute("contentPage", "admin/discounts");
         model.addAttribute("activeMenu", "discount-code");
         return "layouts/admin-layout";
-    }
-
-    @GetMapping("/import-receipts")
-    public String showImportReceiptManagement() {
-        return "admin-import-receipt";
     }
 
     @GetMapping("/payments")

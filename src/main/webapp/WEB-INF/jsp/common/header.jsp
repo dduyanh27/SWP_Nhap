@@ -10,6 +10,7 @@
             <!-- Main CSS -->
             <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
         </head>
+        <link rel="icon" type="image/jpeg" href="${pageContext.request.contextPath}/logo.jpg">
 
         <body>
 
@@ -54,7 +55,7 @@
 
                     <div class="search-bar" id="headerSearchBox" style="position:relative;">
                         <input type="text" id="headerSearchInput" class="search-input"
-                               placeholder="Bạn cần tìm kiếm gì?..." autocomplete="off" />
+                            placeholder="Bạn cần tìm kiếm gì?..." autocomplete="off" />
                         <button type="button" id="headerSearchBtn" class="search-button">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -62,10 +63,12 @@
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
-                        <ul id="searchSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;margin:8px 0 0;padding:0;list-style:none;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.1);z-index:999;max-height:360px;overflow-y:auto;"></ul>
+                        <ul id="searchSuggestions"
+                            style="display:none;position:absolute;top:100%;left:0;right:0;margin:8px 0 0;padding:0;list-style:none;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.1);z-index:999;max-height:360px;overflow-y:auto;">
+                        </ul>
                     </div>
 
-                    <div class="cart-info">
+                    <a href="${pageContext.request.contextPath}/cart" class="cart-info">
                         <span class="cart-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -73,8 +76,8 @@
                                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                         </span>
-                        <a href="${pageContext.request.contextPath}/cart">Giỏ hàng</a>
-                    </div>
+                        <span>Giỏ hàng</span>
+                    </a>
                 </div>
 
                 <!-- NAVIGATION MENU -->

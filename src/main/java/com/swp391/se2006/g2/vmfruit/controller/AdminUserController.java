@@ -1,5 +1,6 @@
 package com.swp391.se2006.g2.vmfruit.controller;
 
+import com.swp391.se2006.g2.vmfruit.dto.request.AdminUserCreateRequest;
 import com.swp391.se2006.g2.vmfruit.dto.request.AdminUserUpdateRequest;
 import com.swp391.se2006.g2.vmfruit.dto.response.AdminUserPageDto;
 import com.swp391.se2006.g2.vmfruit.exception.AdminUserException;
@@ -32,7 +33,34 @@ public class AdminUserController {
         model.addAttribute("totalCustomers", page.getTotalCustomers());
         model.addAttribute("totalStaffs", page.getTotalStaffs());
         model.addAttribute("userList", page.getUserList());
-        return "admin-user";
+        model.addAttribute("contentPage", "admin/users");
+        model.addAttribute("activeMenu", "user-manage");
+        return "layouts/admin-layout";
+    }
+
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        if (!model.containsAttribute("form")) {
+            AdminUserCreateRequest form = new AdminUserCreateRequest();
+            form.setRole("CUSTOMER");
+            form.setStatus("ACTIVE");
+            model.addAttribute("form", form);
+        }
+        return "admin-user-create";
+    }
+
+    @PostMapping("/create")
+    public String createUser(@ModelAttribute AdminUserCreateRequest request,
+                             RedirectAttributes redirectAttributes) {
+        try {
+            adminUserService.createUser(request);
+            redirectAttributes.addFlashAttribute("success", "Đã tạo người dùng mới.");
+            return "redirect:/admin/users";
+        } catch (AdminUserException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addFlashAttribute("form", request);
+            return "redirect:/admin/users/create";
+        }
     }
 
     @GetMapping("/edit")

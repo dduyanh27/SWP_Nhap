@@ -28,6 +28,16 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @Column(name = "is_prepared", nullable = false)
+    private Boolean isPrepared = false;
+
+    public Boolean getIsPrepared() {
+        return isPrepared;
+    }
+
+    public void setIsPrepared(Boolean isPrepared) {
+        this.isPrepared = isPrepared;
+    }
     @Column(name = "quantity", nullable = false, precision = 10, scale = 2)
     private BigDecimal quantity;
 

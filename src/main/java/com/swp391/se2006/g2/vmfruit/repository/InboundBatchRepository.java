@@ -13,4 +13,7 @@ public interface InboundBatchRepository extends JpaRepository<InboundBatch, Inte
             "b.batchId, b.importReceipt.importReceiptId, b.importReceipt.supplier.supplierName, b.receivedDate, b.batchStatus) " +
             "FROM InboundBatch b ORDER BY b.receivedDate DESC")
     List<BatchGroupResponse> getAllBatchGroups();
+
+    @Query("SELECT b.importReceipt.importReceiptId FROM InboundBatch b")
+    List<Integer> findAllImportReceiptIds();
 }

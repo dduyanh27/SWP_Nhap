@@ -5,4 +5,10 @@ import java.util.List;
 
 public interface ReviewService {
     List<Review> getVisibleReviews();
+
+    Review createReview(Integer userId, Integer productId, Integer rating, String comment);
+
+    boolean canReviewProduct(Integer userId, Integer productId);
+
+    boolean hasReviewedProduct(Integer userId, Integer productId);
 }

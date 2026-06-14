@@ -35,11 +35,12 @@ public class LoginController {
             session.setAttribute("currentUser", user);
 
             boolean isAdmin = userService.isAdmin(user.getUserId());
+            boolean isSale  = userService.isSale(user.getUserId());
             session.setAttribute("isAdmin", isAdmin);
+            session.setAttribute("isSalesStaff", isSale);
 
-            if (isAdmin) {
-                return "redirect:/admin/dashboard";
-            }
+            if (isAdmin) return "redirect:/admin/dashboard";
+            if (isSale)  return "redirect:/sales/dashboard";
 
             return "redirect:/home";
         } catch (LoginException ex) {
@@ -48,6 +49,7 @@ public class LoginController {
             return "login";
         }
     }
+
 
     @GetMapping("/logout")
     public String handleLogout(HttpSession session) {

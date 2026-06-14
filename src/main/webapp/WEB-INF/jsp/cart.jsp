@@ -63,7 +63,7 @@
                                         <span class="cart-product-name">${item.productName}</span>
                                     </td>
 
-               \
+
                                     <td class="cart-price">
                                         <fmt:formatNumber value="${item.unitPrice}" pattern="#,###"/>đ
                                     </td>

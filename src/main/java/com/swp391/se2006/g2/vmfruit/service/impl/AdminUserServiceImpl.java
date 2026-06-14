@@ -1,16 +1,20 @@
 package com.swp391.se2006.g2.vmfruit.service.impl;
 
+import com.swp391.se2006.g2.vmfruit.dto.request.AdminUserCreateRequest;
 import com.swp391.se2006.g2.vmfruit.dto.request.AdminUserUpdateRequest;
 import com.swp391.se2006.g2.vmfruit.dto.response.AdminUserListItemDto;
 import com.swp391.se2006.g2.vmfruit.dto.response.AdminUserPageDto;
+import com.swp391.se2006.g2.vmfruit.entity.Cart;
 import com.swp391.se2006.g2.vmfruit.entity.Role;
 import com.swp391.se2006.g2.vmfruit.entity.User;
 import com.swp391.se2006.g2.vmfruit.entity.UserRole;
 import com.swp391.se2006.g2.vmfruit.exception.AdminUserException;
+import com.swp391.se2006.g2.vmfruit.repository.CartRepository;
 import com.swp391.se2006.g2.vmfruit.repository.RoleRepository;
 import com.swp391.se2006.g2.vmfruit.repository.UserRepository;
 import com.swp391.se2006.g2.vmfruit.repository.UserRoleRepository;
 import com.swp391.se2006.g2.vmfruit.service.AdminUserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,17 +33,26 @@ public class AdminUserServiceImpl implements AdminUserService {
     private static final String SALES_STAFF_ROLE = "SALES_STAFF";
     private static final String CUSTOMER_ROLE = "CUSTOMER";
     private static final Set<String> ALLOWED_ROLES = Set.of("ADMIN", SALES_STAFF_ROLE, CUSTOMER_ROLE);
+    private static final Set<String> ALLOWED_STATUSES = Set.of("ACTIVE", "INACTIVE");
+    private static final Pattern PASSWORD_PATTERN =
+            Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d).{8,}$");
 
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final RoleRepository roleRepository;
+    private final CartRepository cartRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public AdminUserServiceImpl(UserRepository userRepository,
                                 UserRoleRepository userRoleRepository,
-                                RoleRepository roleRepository) {
+                                RoleRepository roleRepository,
+                                CartRepository cartRepository,
+                                PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.roleRepository = roleRepository;
+        this.cartRepository = cartRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -71,6 +85,55 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .orElseThrow(() -> new AdminUserException("Không tìm thấy người dùng."));
         UserRole userRole = userRoleRepository.findByUser_UserId(userId).orElse(null);
         return toListItem(user, userRole);
+    }
+
+    @Override
+    @Transactional
+    public void createUser(AdminUserCreateRequest request) {
+        String fullName = trim(request.getFullName());
+        String email = trim(request.getEmail()).toLowerCase();
+        String phone = trim(request.getPhoneNumber());
+        String password = request.getPassword();
+        String confirmPassword = request.getConfirmPassword();
+        String roleName = trim(request.getRole()).toUpperCase();
+        String status = trim(request.getStatus()).toUpperCase();
+
+        validateCommonFields(fullName, email, phone);
+        validateRoleAndStatus(roleName, status);
+        validatePassword(password, confirmPassword);
+
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new AdminUserException("Email đã được sử dụng.");
+        }
+        if (userRepository.existsByPhone(phone)) {
+            throw new AdminUserException("Số điện thoại đã được sử dụng.");
+        }
+
+        Role role = roleRepository.findByRoleName(roleName)
+                .orElseThrow(() -> new AdminUserException("Hệ thống chưa cấu hình role " + roleName + "."));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        User user = new User();
+        user.setFullName(fullName);
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setStatus(status);
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+        user = userRepository.save(user);
+
+        UserRole userRole = new UserRole();
+        userRole.setUser(user);
+        userRole.setRole(role);
+        userRoleRepository.save(userRole);
+
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cart.setCreatedAt(now);
+        cart.setUpdatedAt(now);
+        cartRepository.save(cart);
     }
 
     @Override
@@ -182,6 +245,24 @@ public class AdminUserServiceImpl implements AdminUserService {
             return true;
         }
         return statusFilter.equalsIgnoreCase(item.getStatus());
+    }
+
+    private static void validateRoleAndStatus(String roleName, String status) {
+        if (!ALLOWED_ROLES.contains(roleName)) {
+            throw new AdminUserException("Vai trò không hợp lệ.");
+        }
+        if (!ALLOWED_STATUSES.contains(status)) {
+            throw new AdminUserException("Trạng thái không hợp lệ.");
+        }
+    }
+
+    private static void validatePassword(String password, String confirmPassword) {
+        if (password == null || confirmPassword == null || !password.equals(confirmPassword)) {
+            throw new AdminUserException("Mật khẩu xác nhận không khớp.");
+        }
+        if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            throw new AdminUserException("Mật khẩu tối thiểu 8 ký tự, gồm chữ và số.");
+        }
     }
 
     private static void validateCommonFields(String fullName, String email, String phone) {

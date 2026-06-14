@@ -39,6 +39,11 @@ public class GlobalExceptionHandler {
             throw (RuntimeException) ex;
         }
 
+        // Bỏ qua favicon.ico — browser luôn request, không phải lỗi ứng dụng
+        if ("/favicon.ico".equals(request.getRequestURI())) {
+            return null;
+        }
+
         log.error("Unhandled exception on URI [{}]: {}", request.getRequestURI(), ex.getMessage(), ex);
         model.addAttribute("errorMessage", ex.getMessage());
         model.addAttribute("requestUri", request.getRequestURI());

@@ -34,47 +34,6 @@
                         </div>
                     </section>
 
-                    <!-- FEATURE BAR -->
-                    <div class="feature-bar">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <img src="${pageContext.request.contextPath}/asset/icons/delivery.png"
-                                    alt="Giao hàng" />
-                            </div>
-                            <div class="feature-text">
-                                <p class="feature-title">GIAO HÀNG</p>
-                                <p class="feature-desc">Tận nơi - Thanh toán tại nhà</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <img src="${pageContext.request.contextPath}/asset/icons/product.png" alt="Sản phẩm" />
-                            </div>
-                            <div class="feature-text">
-                                <p class="feature-title">SẢN PHẨM</p>
-                                <p class="feature-desc">Cam kết 100% nguồn gốc xuất xứ rõ ràng</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <img src="${pageContext.request.contextPath}/asset/icons/promo.png" alt="Khuyến mãi" />
-                            </div>
-                            <div class="feature-text">
-                                <p class="feature-title">KHUYẾN MÃI</p>
-                                <p class="feature-desc">Luôn luôn có các chương trình khuyến mãi</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <img src="${pageContext.request.contextPath}/asset/icons/support.png" alt="Hỗ trợ" />
-                            </div>
-                            <div class="feature-text">
-                                <p class="feature-title">HỖ TRỢ</p>
-                                <p class="feature-desc">Hotline: 086.255.2155</p>
-                            </div>
-                        </div>
-                    </div>
-
                     <script>
                         let current = 0;
                         const slides = document.querySelectorAll('.slide');
@@ -89,10 +48,52 @@
                         }
 
                         function changeSlide(dir) { showSlide(current + dir); }
+
                         function goToSlide(n) { showSlide(n); }
 
                         setInterval(() => changeSlide(1), 4000);
                     </script>
+
+                    <!-- FEATURE BAR -->
+                    <div class="feature-bar">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <img src="${pageContext.request.contextPath}/asset/icons/delivery.svg"
+                                    alt="Giao hàng" />
+                            </div>
+                            <div class="feature-text">
+                                <p class="feature-title">GIAO HÀNG</p>
+                                <p class="feature-desc">Tận nơi - Thanh toán tại nhà</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <img src="${pageContext.request.contextPath}/asset/icons/product.svg" alt="Sản phẩm" />
+                            </div>
+                            <div class="feature-text">
+                                <p class="feature-title">SẢN PHẨM</p>
+                                <p class="feature-desc">Cam kết 100% nguồn gốc xuất xứ rõ ràng</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <img src="${pageContext.request.contextPath}/asset/icons/promo.svg" alt="Khuyến mãi" />
+                            </div>
+                            <div class="feature-text">
+                                <p class="feature-title">KHUYẾN MÃI</p>
+                                <p class="feature-desc">Luôn luôn có các chương trình khuyến mãi</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <img src="${pageContext.request.contextPath}/asset/icons/support.svg" alt="Hỗ trợ" />
+                            </div>
+                            <div class="feature-text">
+                                <p class="feature-title">HỖ TRỢ</p>
+                                <p class="feature-desc">Hotline: 086.255.2155</p>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- FLASH SALE SECTION -->
                     <section class="flash-sale">
@@ -104,10 +105,10 @@
                             <c:forEach var="product" items="${products}" begin="0" end="7">
                                 <div class="product-card">
 
-                                    <div class="product-image-container">
+                                    <a href="${pageContext.request.contextPath}/products/${product.productId}" class="product-image-container">
                                         <c:choose>
                                             <c:when test="${not empty product.imageUrl}">
-                                                <img class="product-img" src="${product.imageUrl}"
+                                                <img class="product-img" src="${pageContext.request.contextPath}/${product.imageUrl}"
                                                     alt="${product.productName}">
                                             </c:when>
 
@@ -115,10 +116,12 @@
                                                 <span class="hero-image-placeholder">IMAGE PLACEHOLDER</span>
                                             </c:otherwise>
                                         </c:choose>
-                                    </div>
+                                    </a>
 
                                     <div class="product-info">
-                                        <h3 class="product-name">${product.productName}</h3>
+                                        <a href="${pageContext.request.contextPath}/products/${product.productId}" class="product-name">
+                                            ${product.productName}
+                                        </a>
 
                                         <p class="product-desc">
                                             ${product.description}
@@ -128,7 +131,7 @@
                                             <fmt:formatNumber value="${product.basePrice}" pattern="#,###" />đ
                                         </div>
 
-                                        <button class="btn-add-cart" onclick="handleAddToCart(${product.productId})">
+                                        <button class="btn-add-cart" data-product-id="${product.productId}">
                                             THÊM VÀO GIỎ
                                         </button>
                                     </div>
@@ -194,20 +197,34 @@
                     <script>
                         const isLoggedIn = ${ not empty sessionScope.currentUser };
 
-                        function handleAddToCart(productId) {
-                            if (!isLoggedIn) {
-                                document.getElementById('loginModal').style.display = 'flex';
-                                return;
-                            }
-
-                        }
-
                         function closeLoginModal() {
                             document.getElementById('loginModal').style.display = 'none';
                         }
 
                         document.addEventListener('keydown', function (e) {
                             if (e.key === 'Escape') closeLoginModal();
+                        });
+
+                        document.querySelectorAll('.btn-add-cart').forEach(function(btn) {
+                            btn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                var productId = this.getAttribute('data-product-id');
+                                if (!isLoggedIn) {
+                                    document.getElementById('loginModal').style.display = 'flex';
+                                    return;
+                                }
+                                var form = document.createElement('form');
+                                form.method = 'POST';
+                                form.style.display = 'none';
+                                form.action = '${pageContext.request.contextPath}/cart/add';
+                                var input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'productId';
+                                input.value = productId;
+                                form.appendChild(input);
+                                document.body.appendChild(form);
+                                form.submit();
+                            });
                         });
                     </script>
 
