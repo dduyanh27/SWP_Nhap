@@ -45,8 +45,8 @@
                             <tr>
                                 <th>Sản phẩm</th>
                                 <th>Đơn giá</th>
-                                <th>Số lượng</th>
                                 <th>Đơn vị</th>
+                                <th>Số lượng</th>
                                 <th>Thành tiền</th>
                                 <th></th>
                             </tr>
@@ -67,7 +67,7 @@
                                     <td class="cart-price">
                                         <fmt:formatNumber value="${item.unitPrice}" pattern="#,###"/>đ
                                     </td>
-
+                                    <td class="cart-unit">${item.unit}</td>
 
                                     <td>
                                         <div class="qty-control">
@@ -87,7 +87,7 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td class="cart-unit">${item.unit}</td>
+
 
 
                                     <td class="cart-subtotal">
@@ -130,19 +130,13 @@
                             </span>
                         </div>
 
-                        <div class="summary-promo">
-                            <input type="text" class="promo-input" placeholder="Mã khuyến mãi">
-                            <button class="btn-promo">Áp dụng</button>
-                        </div>
+
 
                         <a href="${pageContext.request.contextPath}/checkout" class="btn-checkout">
                             Tiến hành thanh toán
                         </a>
 
-                        <div class="summary-note">
-                            <label>Ghi chú đơn hàng:</label>
-                            <textarea class="note-textarea" rows="4" placeholder="Nhập ghi chú..."></textarea>
-                        </div>
+
                     </div>
 
                 </div>

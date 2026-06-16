@@ -8,6 +8,7 @@ import com.swp391.se2006.g2.vmfruit.entity.Product;
 import com.swp391.se2006.g2.vmfruit.entity.User;
 import com.swp391.se2006.g2.vmfruit.repository.CategoryRepository;
 import com.swp391.se2006.g2.vmfruit.service.AdminBatchService;
+import com.swp391.se2006.g2.vmfruit.service.AdminCategoryService;
 import com.swp391.se2006.g2.vmfruit.service.AdminProductService;
 import com.swp391.se2006.g2.vmfruit.service.AdminService;
 import com.swp391.se2006.g2.vmfruit.service.UserService;
@@ -15,8 +16,10 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -31,17 +34,20 @@ public class AdminController {
     private final UserService userService;
     private final AdminBatchService adminBatchService;
     private final CategoryRepository categoryRepository;
+    private final AdminCategoryService adminCategoryService;
 
     public AdminController(AdminService adminService,
                            AdminProductService adminProductService,
                            UserService userService,
                            AdminBatchService adminBatchService,
-                           CategoryRepository categoryRepository) {
-        this.adminService        = adminService;
-        this.adminProductService = adminProductService;
-        this.userService         = userService;
-        this.adminBatchService   = adminBatchService;
-        this.categoryRepository  = categoryRepository;
+                           CategoryRepository categoryRepository,
+                           AdminCategoryService adminCategoryService) {
+        this.adminService           = adminService;
+        this.adminProductService    = adminProductService;
+        this.userService            = userService;
+        this.adminBatchService      = adminBatchService;
+        this.categoryRepository     = categoryRepository;
+        this.adminCategoryService   = adminCategoryService;
     }
 
     @GetMapping("/dashboard")
@@ -61,15 +67,22 @@ public class AdminController {
     }
 
     @GetMapping("/products")
-    public String showProductManagement(Model model) {
+    public String showProductManagement(@RequestParam(value = "sort",  required = false, defaultValue = "stock_asc") String sort,
+                                        @RequestParam(value = "price", required = false, defaultValue = "")          String price,
+                                        Model model) {
         ProductStatsResponse stats = adminProductService.getProductStats();
         model.addAttribute("lowStockCount",    stats.getLowStockCount());
         model.addAttribute("expiringSoonCount", stats.getExpiringSoonCount());
         model.addAttribute("hiddenCount",      stats.getHiddenItemsCount());
         model.addAttribute("totalProducts",    stats.getTotalProductsCount());
 
-        List<ProductRowResponse> list = adminProductService.getAllProductRows();
+        List<ProductRowResponse> list = adminProductService.getAllProductRows(sort, price);
         model.addAttribute("productList", list);
+
+        // Giữ lại giá trị đã chọn để JSP hiển thị đúng option
+        model.addAttribute("currentSort",  sort);
+        model.addAttribute("currentPrice", price);
+
         model.addAttribute("contentPage", "admin/products");
         model.addAttribute("activeMenu", "fruit-manage");
         return "layouts/admin-layout";
@@ -93,6 +106,28 @@ public class AdminController {
             adminProductService.toggleProductStatus(id);
         } catch (Exception ignored) {}
         return "redirect:/admin/products";
+    }
+
+    /**
+     * POST /admin/categories/create
+     * Tạo category mới rồi redirect về trang New/Edit Product.
+     * Tham số "returnId" nếu có → redirect về trang Edit Product (id=returnId).
+     */
+    @PostMapping("/categories/create")
+    public String createCategory(@RequestParam("categoryName")           String categoryName,
+                                 @RequestParam(value = "returnId", required = false) Integer returnId,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            adminCategoryService.createCategory(categoryName);
+            redirectAttributes.addFlashAttribute("catMsg", "Category \"" + categoryName.trim() + "\" đã được tạo!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("catError", "Lỗi: " + e.getMessage());
+        }
+
+        if (returnId != null) {
+            return "redirect:/admin/products/edit?id=" + returnId;
+        }
+        return "redirect:/admin/products/new";
     }
 
     @GetMapping("/products/edit")
@@ -135,12 +170,12 @@ public class AdminController {
         return "layouts/admin-layout";
     }
 
-    @GetMapping("/orders")
-    public String showOrders(Model model) {
-        model.addAttribute("contentPage", "admin/orders");
-        model.addAttribute("activeMenu", "order-manage");
-        return "layouts/admin-layout";
-    }
+//    @GetMapping("/orders")
+//    public String showOrders(Model model) {
+//        model.addAttribute("contentPage", "admin/orders");
+//        model.addAttribute("activeMenu", "order-manage");
+//        return "layouts/admin-layout";
+//    }
 
     @GetMapping("/discounts")
     public String showDiscounts(Model model) {

@@ -34,7 +34,7 @@
             </c:when>
 
             <c:otherwise>
-                <form id="checkoutForm" action="#" method="POST" novalidate>
+                <form id="checkoutForm" action="${pageContext.request.contextPath}/checkout" method="POST" novalidate>
                     <div class="checkout-layout">
 
                         <div class="checkout-form-section">
@@ -112,15 +112,24 @@
                                 <h3 class="checkout-card-title">Phương thức thanh toán</h3>
                                 <div class="payment-options">
                                     <label class="payment-option">
-                                        <input type="radio" name="paymentMethod" value="VNPAY" checked>
+                                        <input type="radio" name="paymentMethod" value="VIETQR" checked>
                                         <div class="payment-option-info">
-                                            <div class="payment-option-name">Thanh toán qua VNPay</div>
-                                            <div class="payment-option-desc">Quét mã QR hoặc thanh toán qua thẻ/ngân hàng trên cổng VNPay</div>
+                                            <div class="payment-option-name">Chuyển khoản VietQR</div>
+                                            <div class="payment-option-desc">Quét mã QR bên dưới và bấm xác nhận sau khi chuyển khoản.</div>
                                         </div>
-                                        <img src="${pageContext.request.contextPath}/asset/vnpay-logo.png"
-                                             alt="VNPay" class="payment-logo"
-                                             onerror="this.style.display='none'">
+                                        <span class="payment-logo-text">VietQR</span>
                                     </label>
+                                    <div class="vietqr-box">
+                                        <img class="vietqr-image"
+                                             src="https://img.vietqr.io/image/${vietQrBankId}-${vietQrAccountNo}-compact2.png?amount=${vietQrAmount}&addInfo=${vietQrInfoEncoded}&accountName=${vietQrAccountNameEncoded}"
+                                             alt="VietQR ${vietQrBankId} ${vietQrAccountNo}">
+                                        <div class="vietqr-details">
+                                            <div><span>Ngân hàng:</span> <strong>${vietQrBankId}</strong></div>
+                                            <div><span>Số tài khoản:</span> <strong>${vietQrAccountNo}</strong></div>
+                                            <div><span>Chủ tài khoản:</span> <strong>${vietQrAccountName}</strong></div>
+                                            <div><span>Nội dung:</span> <strong>${vietQrInfo}</strong></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -170,8 +179,8 @@
                                 </span>
                             </div>
 
-                            <button type="button" class="btn-place-order" id="btnPlaceOrder">
-                                Thanh toán VNPay
+                            <button type="submit" class="btn-place-order" id="btnPlaceOrder">
+                                Xác nhận chuyển khoản
                             </button>
                         </aside>
 
@@ -206,12 +215,13 @@
 
     const btnPlaceOrder = document.getElementById('btnPlaceOrder');
     if (btnPlaceOrder) {
-        btnPlaceOrder.addEventListener('click', function () {
+        btnPlaceOrder.addEventListener('click', function (event) {
+            event.preventDefault();
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
-            alert('Chức năng thanh toán VNPay sẽ được kết nối backend sau.');
+            form.submit();
         });
     }
 })();

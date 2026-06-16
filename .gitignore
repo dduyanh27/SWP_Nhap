@@ -37,3 +37,6 @@ build/
 # Team Private Configurations
 # ==========================================
 src/main/resources/application-local.properties
+
+# Local DB migration scripts
+sql/change-orders-default-status-pending.sql

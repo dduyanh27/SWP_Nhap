@@ -17,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminProductImpl implements AdminProductService {
@@ -55,6 +57,49 @@ public class AdminProductImpl implements AdminProductService {
     @Override
     public List<ProductRowResponse> getAllProductRows() {
         return productRepository.getAllProductRowsForAdmin();
+    }
+
+    @Override
+    public List<ProductRowResponse> getAllProductRows(String sort, String price) {
+        List<ProductRowResponse> list = productRepository.getAllProductRowsForAdmin();
+
+        // --- Lọc theo giá ---
+        if (price != null && !price.isEmpty()) {
+            list = list.stream().filter(p -> {
+                java.math.BigDecimal bp = p.getBasePrice();
+                if (bp == null) return false;
+                return switch (price) {
+                    case "under_100"  -> bp.compareTo(new java.math.BigDecimal("100000")) < 0;
+                    case "100_300"    -> bp.compareTo(new java.math.BigDecimal("100000")) >= 0
+                                     && bp.compareTo(new java.math.BigDecimal("300000")) <= 0;
+                    case "over_300"   -> bp.compareTo(new java.math.BigDecimal("300000")) > 0;
+                    default -> true;
+                };
+            }).collect(Collectors.toList());
+        }
+
+        // --- Sắp xếp ---
+        if (sort != null) {
+            list = switch (sort) {
+                case "stock_asc"  -> list.stream()
+                        .sorted(Comparator.comparingDouble(p -> p.getStock() == null ? 0 : p.getStock().doubleValue()))
+                        .collect(Collectors.toList());
+                case "stock_desc" -> list.stream()
+                        .sorted(Comparator.comparingDouble((ProductRowResponse p) ->
+                                p.getStock() == null ? 0 : p.getStock().doubleValue()).reversed())
+                        .collect(Collectors.toList());
+                case "price_asc"  -> list.stream()
+                        .sorted(Comparator.comparingDouble(p -> p.getBasePrice() == null ? 0 : p.getBasePrice().doubleValue()))
+                        .collect(Collectors.toList());
+                case "price_desc" -> list.stream()
+                        .sorted(Comparator.comparingDouble((ProductRowResponse p) ->
+                                p.getBasePrice() == null ? 0 : p.getBasePrice().doubleValue()).reversed())
+                        .collect(Collectors.toList());
+                default -> list;
+            };
+        }
+
+        return list;
     }
 
     @Override

@@ -5,11 +5,17 @@ import java.util.List;
 
 public interface OrderService {
 
-     List<Order> getOrdersByUser(Integer userId);
+    List<Order> getOrdersByUser(Integer userId);
+    Order getOrderById(Integer orderId);
 
+    void updateOrderStatus(Integer orderId, String status);
+     List<Order> getOrdersByUserAndStatus(Integer userId, String status);
 
-     Order getOrderById(Integer orderId);
+     List<Order> getOrdersByUserAndStatuses(Integer userId, List<String> statuses);
 
+    List<Order> getAllOrders();
+    
+    List<Order> getFilteredOrders(String status, Integer year, Integer month);
 
     long countOrdersByUserAndStatus(Integer userId, String orderStatus);
 }

@@ -4,11 +4,20 @@
 <div class="profile-card p-3">
     <div class="d-flex align-items-center mb-3 border-bottom pb-3">
         <div class="rounded-circle bg-light d-flex justify-content-center align-items-center me-3" style="width: 50px; height: 50px;">
-            <img src="<c:url value='/images/default-avatar.png'/>" class="rounded-circle" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
+            <c:choose>
+                <%-- Kiểm tra xem user có avatar trong Database không --%>
+                <c:when test="${not empty sessionScope.currentUser.avatarUrl}">
+                    <img src="${sessionScope.currentUser.avatarUrl}" class="rounded-circle" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
+                </c:when>
+                <%-- Nếu không có, hiển thị ảnh mặc định --%>
+                <c:otherwise>
+                    <img src="<c:url value='/asset/avatar/customer5.jpg'/>" class="rounded-circle" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
+                </c:otherwise>
+            </c:choose>
         </div>
         <div>
             <h6 class="mb-0 fw-bold">
-              <span>${sessionScope.currentUser.fullName}</span>
+                <span>${sessionScope.currentUser.fullName}</span>
             </h6>
             <a href="<c:url value='/profile'/>" class="text-success small text-decoration-none">Sửa hồ sơ</a>
         </div>

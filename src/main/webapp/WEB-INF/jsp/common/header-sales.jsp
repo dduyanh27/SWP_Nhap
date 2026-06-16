@@ -26,4 +26,9 @@
        class="${activePage == 'orders' ? 'active' : ''}">
         <span class="dot"></span>DANH SÁCH ĐẶT ONLINE
     </a>
+
+    <a href="${pageContext.request.contextPath}/sales/imports"
+           class="${activePage == 'imports' ? 'active' : ''}">
+            <span class="dot"></span>DANH SÁCH NHẬP HÀNG
+        </a>
 </div>

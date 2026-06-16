@@ -67,7 +67,7 @@ public class SalesController {
         } else if (hasPhone) {
             orders = orderRepository.findByAddressPhone(phone, pageable);
         } else if (hasStatus) {
-            orders = orderRepository.findByOrderStatusOrderByOrderDateDesc(status, pageable);
+            orders = orderRepository.findByOrderStatus(status, pageable);
         } else {
             orders = orderRepository.findAllByOrderByOrderDateDesc(pageable);
         }
@@ -233,5 +233,7 @@ public class SalesController {
         });
         return result;
     }
+
+
 
 }

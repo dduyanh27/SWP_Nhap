@@ -12,18 +12,15 @@ public interface AdminProductService {
 
     List<ProductRowResponse> getAllProductRows();
 
-    /** Tạo sản phẩm mới, trả về entity đã lưu */
+    List<ProductRowResponse> getAllProductRows(String sort, String price);
+
     Product createProduct(ProductRequest request);
 
-    /** Lấy entity theo id để điền vào form chỉnh sửa */
     Product getProductById(Integer productId);
 
-    /** Cập nhật thông tin sản phẩm */
     Product updateProduct(ProductRequest request);
 
-    /** Ẩn/Hiện sản phẩm (toggle ACTIVE ↔ INACTIVE) */
     void toggleProductStatus(Integer productId);
 
-    /** Xoá vĩnh viễn sản phẩm */
     void deleteProduct(Integer productId);
 }

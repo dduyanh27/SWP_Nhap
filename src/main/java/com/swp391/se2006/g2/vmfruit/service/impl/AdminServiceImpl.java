@@ -41,7 +41,7 @@ public class AdminServiceImpl implements AdminService {
             stats.put("totalProducts", productRepository.count());
             stats.put("totalCategories", categoryRepository.count());
             stats.put("totalOrders", orderRepository.count());
-            stats.put("pendingOrders", orderRepository.countByOrderStatus("PENDING_APPROVAL"));
+            stats.put("pendingOrders", orderRepository.countByOrderStatus("PENDING"));
             stats.put("totalRevenue", orderRepository.sumTotalAmountByPaymentStatus("PAID"));
             stats.put("recentOrders", orderRepository.findTop5ByOrderByCreatedAtDesc());
             stats.put("recentUsers", userRepository.findTop5ByOrderByCreatedAtDesc());

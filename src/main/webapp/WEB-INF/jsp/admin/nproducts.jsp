@@ -33,6 +33,14 @@
     <%-- Alert area --%>
     <div id="nfAlert" class="nf-alert" style="display:none;"></div>
 
+    <%-- Flash message từ controller (tạo category thành công / lỗi) --%>
+    <c:if test="${not empty catMsg}">
+        <div class="nf-alert nf-alert--success" style="margin:16px 32px 0;">${catMsg}</div>
+    </c:if>
+    <c:if test="${not empty catError}">
+        <div class="nf-alert nf-alert--error" style="margin:16px 32px 0;">${catError}</div>
+    </c:if>
+
     <%-- Card Body --%>
     <div class="nf-card-body">
 
@@ -80,6 +88,19 @@
                         </div>
                     </div>
                 </div>
+
+            <%-- ── THÊM CATEGORY MỚI (form HTML thuần, không JS) ──────── --%>
+            <div class="nf-new-cat-box">
+                <p class="nf-new-cat-title">Không tìm thấy category? Tạo mới ngay:</p>
+                <form method="post"
+                      action="${pageContext.request.contextPath}/admin/categories/create"
+                      class="nf-new-cat-form">
+                    <input type="hidden" name="returnId" value="${isEdit ? product.productId : ''}" />
+                    <input type="text" name="categoryName" class="nf-input nf-new-cat-input"
+                           placeholder="VD: Trái cây nhập khẩu" required />
+                    <button type="submit" class="nf-new-cat-btn">+ Tạo &amp; thêm</button>
+                </form>
+            </div>
             </div>
 
             <%-- Price + Unit --%>
@@ -601,11 +622,39 @@
     }
     @keyframes nfSpin { to { transform: rotate(360deg); } }
 
+    /* ── New category inline box ───────────────────────────────── */
+    .nf-new-cat-box {
+        margin-top: 10px; padding: 12px 14px;
+        background: #f8fafc; border: 1.5px dashed #cbd5e1;
+        border-radius: 10px;
+    }
+    .nf-new-cat-title {
+        font-size: 0.78rem; font-weight: 600; color: #64748b;
+        margin: 0 0 8px;
+    }
+    .nf-new-cat-form {
+        display: flex; gap: 8px; align-items: center;
+    }
+    .nf-new-cat-input {
+        flex: 1; padding: 9px 12px; font-size: 0.85rem;
+    }
+    .nf-new-cat-btn {
+        white-space: nowrap; padding: 9px 16px;
+        background: #10b981; color: #fff;
+        border: none; border-radius: 9px;
+        font-size: 0.85rem; font-weight: 700;
+        cursor: pointer; font-family: inherit;
+        transition: background 0.2s;
+    }
+    .nf-new-cat-btn:hover { background: #059669; }
+
     /* Responsive */
     @media (max-width: 720px) {
         .nf-card-body { grid-template-columns: 1fr; }
         .nf-image-section { order: -1; }
         .nf-image-box { max-height: 180px; aspect-ratio: auto; }
         .nf-grid-2 { grid-template-columns: 1fr; }
+        .nf-new-cat-form { flex-direction: column; }
+        .nf-new-cat-btn { width: 100%; }
     }
 </style>
