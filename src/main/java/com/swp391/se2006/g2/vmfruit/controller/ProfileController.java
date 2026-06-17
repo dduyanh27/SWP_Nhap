@@ -6,7 +6,6 @@ import com.swp391.se2006.g2.vmfruit.entity.Order;
 import com.swp391.se2006.g2.vmfruit.entity.User;
 import com.swp391.se2006.g2.vmfruit.repository.OrderItemRepository;
 import com.swp391.se2006.g2.vmfruit.service.UserService;
-import com.swp391.se2006.g2.vmfruit.service.OrderService;
 import com.swp391.se2006.g2.vmfruit.service.CustomerAddressService;
 import com.swp391.se2006.g2.vmfruit.service.NotificationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import com.swp391.se2006.g2.vmfruit.service.OrderService;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.Arrays;

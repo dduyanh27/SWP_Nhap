@@ -485,6 +485,32 @@ a {
     font-size: 13px;
 }
 
+.btn-sort {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-sort:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.btn-sort.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
 .btn-add-product {
     background-color: #10b981;
     color: #ffffff;
@@ -784,6 +810,11 @@ a {
     background: #ffffff;
 }
 
+.admin-form-row {
+    display: flex;
+    gap: 16px;
+}
+
 .admin-form-actions {
     display: flex;
     gap: 12px;
@@ -1061,4 +1092,105 @@ a {
 #orderDetailsModal .table th {
     background-color: #f8f9fa;
     font-weight: 600;
+}
+
+/*reports*/
+.admin-sidebar {
+    background-color: #2b3445; /* Màu nền tối của sidebar */
+    color: #a0aec0;
+}
+.sidebar-brand h2 {
+    color: #ffffff;
+    text-decoration: underline; /* Gạch chân tiêu đề VMFruit Admin */
+    color: #63b3ed;
+}
+.sidebar-nav-item.active {
+    background-color: #3b5998; /* Nền xanh dương mục đang chọn */
+    border-left-color: #3b5998;
+    color: #ffffff;
+}
+
+/* --- Highlight từ khóa (Yellow highlight) --- */
+.highlight-word {
+    background-color: #f6e05e; /* Màu vàng */
+    color: #1a202c;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+
+/* --- Các thẻ thống kê (Stats) --- */
+.stat-cards-grid.grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.stat-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+.stat-card .stat-label {
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+}
+.stat-card .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+/* --- Các nút (Buttons) theo thiết kế --- */
+.btn-create-outline {
+    background-color: transparent;
+    color: #2b6cb0;
+    border: 1px solid #2b6cb0;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.btn-create-outline:hover {
+    background-color: #ebf8ff;
+}
+
+.btn-add-item {
+    background-color: #3b5998; /* Xanh đậm */
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    height: 42px;
+}
+.btn-add-item:hover {
+    background-color: #2c437b;
+    color: #ffffff;
+}
+
+.btn-create-success {
+    background-color: #48bb78; /* Xanh lá */
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    padding: 10px 30px;
+}
+.btn-create-success:hover {
+    background-color: #38a169;
+    color: #ffffff;
+}
+
+/* --- Màu chữ tổng tiền --- */
+.total-value-green {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #48bb78;
 }

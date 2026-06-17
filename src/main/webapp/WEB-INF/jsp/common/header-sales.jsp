@@ -14,21 +14,25 @@
 <div class="nav">
     <a href="${pageContext.request.contextPath}/sales/dashboard"
        class="${activePage == 'dashboard' ? 'active' : ''}">
-        <span class="dot"></span>DASHBOARD
+        <span class="dot">●</span>
+        DASHBOARD
     </a>
 
     <a href="${pageContext.request.contextPath}/sales/checkout"
        class="${activePage == 'checkout' ? 'active' : ''}">
-        <span class="dot"></span>CHECKOUT
+        <span class="dot">●</span>
+        CHECKOUT
     </a>
 
     <a href="${pageContext.request.contextPath}/sales/orders"
        class="${activePage == 'orders' ? 'active' : ''}">
-        <span class="dot"></span>DANH SÁCH ĐẶT ONLINE
+        <span class="dot">●</span>
+        DANH SÁCH ĐẶT ONLINE
     </a>
 
     <a href="${pageContext.request.contextPath}/sales/imports"
-           class="${activePage == 'imports' ? 'active' : ''}">
-            <span class="dot"></span>DANH SÁCH NHẬP HÀNG
-        </a>
+       class="${activePage == 'imports' ? 'active' : ''}">
+        <span class="dot">●</span>
+        DANH SÁCH NHẬP HÀNG
+    </a>
 </div>

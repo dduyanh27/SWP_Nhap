@@ -36,7 +36,7 @@
 
     <div class="row">
         <div class="col-md-3 mb-4">
-        <jsp:include page="common/profile-left.jsp" />
+            <jsp:include page="common/profile-left.jsp" />
         </div>
 
         <div class="col-md-9">
@@ -83,7 +83,10 @@
                                     </div>
                                     <div class="mb-4 d-flex align-items-center">
                                         <label class="w-25 text-end pe-3 text-muted">Ngày sinh</label>
-                                        <input type="date" class="form-control w-75" name="dateOfBirth" value="<fmt:formatDate value='${user.dateOfBirth}' pattern='yyyy-MM-dd'/>">
+                                        <input type="date"
+                                               class="form-control w-75"
+                                               name="dateOfBirth"
+                                               value="${user.dateOfBirth}">
                                     </div>
                                     <div class="d-flex">
                                         <div class="w-25"></div>
@@ -102,11 +105,6 @@
                                                     <img src="<c:url value='/asset/avatar/customer1.jpg'/>" id="avatarPreview" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                                                 </c:otherwise>
                                             </c:choose>
-                                        </div>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm mb-2" onclick="document.getElementById('avatarFile').click()">Chọn ảnh</button>
-
-                                        <input type="file" id="avatarFile" name="avatarFile" accept=".jpg, .jpeg, .png" style="display:none;" onchange="previewImage(event)">
-                                        <div class="text-muted small">Dung lượng tối đa 5 MB<br>Định dạng: .JPEG, .PNG</div>
                                     </div>
                                 </div>
                             </div>

@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -40,6 +41,25 @@ public class ImportReceipt {
 
     @Column(name = "note", length = 255)
     private String note;
+    @Column(name = "unit_cost", nullable = false)
+    private BigDecimal unitCost;
+    public BigDecimal getUnitCost() {
+        return unitCost;
+    }
+
+    public void setUnitCost(BigDecimal unitCost) {
+        this.unitCost = unitCost;
+    }
+
+    public Integer getTotalExpectedQuantity() {
+        return totalExpectedQuantity;
+    }
+
+    public void setTotalExpectedQuantity(Integer totalExpectedQuantity) {
+        this.totalExpectedQuantity = totalExpectedQuantity;
+    }
+    @Column(name = "total_expected_quantity", nullable = false)
+    private Integer totalExpectedQuantity;
 
     public Integer getImportReceiptId() {
         return importReceiptId;

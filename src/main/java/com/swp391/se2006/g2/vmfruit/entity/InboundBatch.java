@@ -1,16 +1,9 @@
 package com.swp391.se2006.g2.vmfruit.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "InboundBatches")
@@ -37,6 +30,9 @@ public class InboundBatch {
 
     @Column(name = "note", length = 255)
     private String note;
+
+    @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
+    private List<InboundBatchItem> batchItems;
 
     public Integer getBatchId() {
         return batchId;
@@ -84,5 +80,13 @@ public class InboundBatch {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public List<InboundBatchItem> getBatchItems() {
+        return batchItems;
+    }
+
+    public void setBatchItems(List<InboundBatchItem> batchItems) {
+        this.batchItems = batchItems;
     }
 }

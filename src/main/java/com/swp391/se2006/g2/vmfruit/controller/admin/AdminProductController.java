@@ -15,10 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Controller xử lý CRUD sản phẩm cho admin (popup / AJAX).
- * Tất cả endpoint đều trả JSON để frontend popup tương tác.
- */
+
 @Controller
 @RequestMapping("/admin/products")
 public class AdminProductController {

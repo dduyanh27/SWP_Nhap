@@ -22,6 +22,9 @@ public class DiscountCode {
     @Column(name = "code", nullable = false, unique = true, length = 20)
     private String code;
 
+    @Column(name = "discount_type", nullable = false, length = 20)
+    private String discountType = "PERCENTAGE";
+
     @Column(name = "min_order_amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal minOrderAmount = BigDecimal.ZERO;
 
@@ -66,6 +69,14 @@ public class DiscountCode {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getDiscountType() {
+        return discountType;
+    }
+
+    public void setDiscountType(String discountType) {
+        this.discountType = discountType;
     }
 
     public BigDecimal getMinOrderAmount() {
@@ -146,5 +157,20 @@ public class DiscountCode {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getEndDateFormatted() {
+        if (endDate == null) return "";
+        return endDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
+    }
+
+    public String getStartDateFormatted() {
+        if (startDate == null) return "";
+        return startDate.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+    }
+
+    public String getEndDateFormattedInput() {
+        if (endDate == null) return "";
+        return endDate.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
     }
 }

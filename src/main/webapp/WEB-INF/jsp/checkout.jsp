@@ -11,7 +11,6 @@
 
 <main class="main-content">
     <div class="checkout-wrapper">
-
         <nav class="checkout-breadcrumb" aria-label="Breadcrumb">
             <a href="${pageContext.request.contextPath}/">Trang chủ</a>
             <span> / </span>
@@ -21,7 +20,7 @@
         </nav>
 
         <h2 class="checkout-title">Thanh toán đơn hàng</h2>
-        <p class="checkout-subtitle">Vui lòng điền thông tin giao hàng và xác nhận đơn hàng của bạn.</p>
+        <p class="checkout-subtitle">Chọn địa chỉ giao hàng, quét mã VietQR và xác nhận chuyển khoản.</p>
 
         <c:choose>
             <c:when test="${empty cartItems}">
@@ -36,76 +35,51 @@
             <c:otherwise>
                 <form id="checkoutForm" action="${pageContext.request.contextPath}/checkout" method="POST" novalidate>
                     <div class="checkout-layout">
-
                         <div class="checkout-form-section">
-
-                            <c:if test="${not empty addressList}">
-                                <div class="checkout-card">
-                                    <h3 class="checkout-card-title">Địa chỉ đã lưu</h3>
-                                    <div class="saved-address-list">
-                                        <c:forEach var="addr" items="${addressList}">
-                                            <label class="saved-address-item${addr.isDefault ? ' selected' : ''}"
-                                                   data-name="${addr.receiverName}"
-                                                   data-phone="${addr.phone}"
-                                                   data-address="${addr.fullAddress}">
-                                                <input type="radio" name="savedAddress"
-                                                       value="${addr.addressId}"
-                                                       ${addr.isDefault ? 'checked' : ''}>
-                                                <div class="saved-address-info">
-                                                    <div class="saved-address-name">
-                                                        ${addr.receiverName} — ${addr.phone}
-                                                        <c:if test="${addr.isDefault}">
-                                                            <span class="saved-address-badge">Mặc định</span>
-                                                        </c:if>
-                                                    </div>
-                                                    <div class="saved-address-detail">${addr.fullAddress}</div>
-                                                </div>
-                                            </label>
-                                        </c:forEach>
-                                    </div>
-                                </div>
-                            </c:if>
-
                             <div class="checkout-card">
-                                <h3 class="checkout-card-title">Thông tin giao hàng</h3>
-
-                                <div class="checkout-form-group">
-                                    <label for="receiverName">Họ và tên người nhận <span class="required">*</span></label>
-                                    <input type="text" id="receiverName" name="receiverName" class="checkout-input"
-                                           placeholder="Nhập họ và tên"
-                                           value="${not empty defaultAddress ? defaultAddress.receiverName : currentUser.fullName}"
-                                           required>
+                                <div class="checkout-card-heading">
+                                    <h3 class="checkout-card-title">Địa chỉ giao hàng</h3>
+                                    <button type="button" class="btn-add-address" id="btnOpenAddressModal">
+                                        Thêm địa chỉ mới
+                                    </button>
                                 </div>
 
-                                <div class="checkout-form-row">
-                                    <div class="checkout-form-group">
-                                        <label for="phone">Số điện thoại <span class="required">*</span></label>
-                                        <input type="tel" id="phone" name="phone" class="checkout-input"
-                                               placeholder="Nhập số điện thoại"
-                                               value="${not empty defaultAddress ? defaultAddress.phone : currentUser.phone}"
-                                               required>
-                                    </div>
-                                    <div class="checkout-form-group">
-                                        <label for="email">Email <span class="required">*</span></label>
-                                        <input type="email" id="email" name="email" class="checkout-input"
-                                               placeholder="Nhập email"
-                                               value="${currentUser.email}"
-                                               required>
-                                    </div>
-                                </div>
+                                <c:if test="${not empty successMessage}">
+                                    <div class="checkout-alert checkout-alert-success">${successMessage}</div>
+                                </c:if>
+                                <c:if test="${not empty errorMessage}">
+                                    <div class="checkout-alert checkout-alert-error">${errorMessage}</div>
+                                </c:if>
 
-                                <div class="checkout-form-group">
-                                    <label for="fullAddress">Địa chỉ giao hàng <span class="required">*</span></label>
-                                    <textarea id="fullAddress" name="fullAddress" class="checkout-textarea"
-                                              placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
-                                              required>${not empty defaultAddress ? defaultAddress.fullAddress : ''}</textarea>
-                                </div>
-
-                                <div class="checkout-form-group">
-                                    <label for="orderNote">Ghi chú đơn hàng</label>
-                                    <textarea id="orderNote" name="orderNote" class="checkout-textarea" rows="3"
-                                              placeholder="Ghi chú thêm cho đơn hàng (không bắt buộc)"></textarea>
-                                </div>
+                                <c:choose>
+                                    <c:when test="${not empty addressList}">
+                                        <div class="saved-address-list">
+                                            <c:forEach var="addr" items="${addressList}" varStatus="loop">
+                                                <label class="saved-address-item${addr.isDefault or (empty defaultAddress and loop.first) ? ' selected' : ''}">
+                                                    <input type="radio"
+                                                           name="addressId"
+                                                           value="${addr.addressId}"
+                                                           required
+                                                           ${addr.isDefault or (empty defaultAddress and loop.first) ? 'checked' : ''}>
+                                                    <div class="saved-address-info">
+                                                        <div class="saved-address-name">
+                                                            ${addr.receiverName} - ${addr.phone}
+                                                            <c:if test="${addr.isDefault}">
+                                                                <span class="saved-address-badge">Mặc định</span>
+                                                            </c:if>
+                                                        </div>
+                                                        <div class="saved-address-detail">${addr.fullAddress}</div>
+                                                    </div>
+                                                </label>
+                                            </c:forEach>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="checkout-address-empty">
+                                            Bạn chưa có địa chỉ giao hàng. Hãy thêm địa chỉ mới để tiếp tục đặt hàng.
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
 
                             <div class="checkout-card">
@@ -168,8 +142,14 @@
                             </div>
 
                             <div class="summary-promo">
-                                <input type="text" class="promo-input" name="promoCode" placeholder="Mã khuyến mãi">
-                                <button type="button" class="btn-promo">Áp dụng</button>
+                                <input type="text" class="promo-input" id="promoCode" placeholder="Mã khuyến mãi">
+                                <button type="button" class="btn-promo" id="btnApplyPromo">Áp dụng</button>
+                            </div>
+                            <input type="hidden" name="discountCode" id="discountCode" value="" />
+
+                            <div id="discountInfo" class="summary-row" style="display:none;">
+                                <span>Giảm giá</span>
+                                <span class="summary-discount" id="discountAmount" style="color:#10b981;">-0đ</span>
                             </div>
 
                             <div class="summary-row summary-total">
@@ -179,13 +159,44 @@
                                 </span>
                             </div>
 
-                            <button type="submit" class="btn-place-order" id="btnPlaceOrder">
+                            <button type="submit" class="btn-place-order" id="btnPlaceOrder" ${empty addressList ? 'disabled' : ''}>
                                 Xác nhận chuyển khoản
                             </button>
                         </aside>
-
                     </div>
                 </form>
+
+                <div class="checkout-modal" id="addressModal" aria-hidden="true">
+                    <div class="checkout-modal-backdrop" data-close-address-modal></div>
+                    <div class="checkout-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="addressModalTitle">
+                        <div class="checkout-modal-header">
+                            <h3 id="addressModalTitle">Thêm địa chỉ mới</h3>
+                            <button type="button" class="checkout-modal-close" data-close-address-modal aria-label="Đóng">×</button>
+                        </div>
+                        <form action="${pageContext.request.contextPath}/checkout/address/add" method="POST">
+                            <div class="checkout-form-group">
+                                <label for="newReceiverName">Tên người nhận <span class="required">*</span></label>
+                                <input type="text" id="newReceiverName" name="receiverName" class="checkout-input" required>
+                            </div>
+                            <div class="checkout-form-group">
+                                <label for="newPhone">Số điện thoại <span class="required">*</span></label>
+                                <input type="tel" id="newPhone" name="phone" class="checkout-input" required>
+                            </div>
+                            <div class="checkout-form-group">
+                                <label for="newFullAddress">Địa chỉ đầy đủ <span class="required">*</span></label>
+                                <textarea id="newFullAddress" name="fullAddress" class="checkout-textarea" required></textarea>
+                            </div>
+                            <label class="checkout-checkbox">
+                                <input type="checkbox" name="isDefault" value="1">
+                                Đặt làm địa chỉ mặc định
+                            </label>
+                            <div class="checkout-modal-actions">
+                                <button type="button" class="btn-modal-secondary" data-close-address-modal>Hủy</button>
+                                <button type="submit" class="btn-modal-primary">Lưu địa chỉ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </c:otherwise>
         </c:choose>
     </div>
@@ -194,12 +205,7 @@
 <script>
 (function () {
     const form = document.getElementById('checkoutForm');
-    if (!form) return;
-
     const addressItems = document.querySelectorAll('.saved-address-item');
-    const receiverName = document.getElementById('receiverName');
-    const phone = document.getElementById('phone');
-    const fullAddress = document.getElementById('fullAddress');
 
     addressItems.forEach(function (item) {
         item.addEventListener('click', function () {
@@ -207,23 +213,69 @@
             item.classList.add('selected');
             const radio = item.querySelector('input[type="radio"]');
             if (radio) radio.checked = true;
-            if (receiverName) receiverName.value = item.dataset.name || '';
-            if (phone) phone.value = item.dataset.phone || '';
-            if (fullAddress) fullAddress.value = item.dataset.address || '';
         });
     });
 
-    const btnPlaceOrder = document.getElementById('btnPlaceOrder');
-    if (btnPlaceOrder) {
-        btnPlaceOrder.addEventListener('click', function (event) {
-            event.preventDefault();
+    if (form) {
+        form.addEventListener('submit', function (event) {
             if (!form.checkValidity()) {
+                event.preventDefault();
                 form.reportValidity();
-                return;
             }
-            form.submit();
         });
     }
+
+    // Discount code
+    var cartTotal = ${cartTotal};
+    var currentDiscount = 0;
+    var codeApplied = false;
+
+    document.getElementById('btnApplyPromo').addEventListener('click', function () {
+        var code = document.getElementById('promoCode').value.trim();
+        if (!code) {
+            alert('Vui lòng nhập mã giảm giá.');
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '${pageContext.request.contextPath}/api/discounts/validate', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var res = JSON.parse(xhr.responseText);
+                if (res.valid) {
+                    var discountVal = parseFloat(res.discountValue);
+                    var discount = 0;
+                    if (res.discountType === 'PERCENTAGE') {
+                        discount = cartTotal * discountVal / 100;
+                        if (res.maxDiscountAmount && discount > parseFloat(res.maxDiscountAmount)) {
+                            discount = parseFloat(res.maxDiscountAmount);
+                        }
+                    } else {
+                        discount = discountVal;
+                    }
+                    if (discount > cartTotal) discount = cartTotal;
+                    discount = Math.floor(discount);
+
+                    currentDiscount = discount;
+                    var finalTotal = Math.floor(cartTotal - discount);
+                    codeApplied = true;
+
+                    document.getElementById('discountCode').value = code;
+                    document.getElementById('discountAmount').textContent = '-' + discount.toLocaleString('vi-VN') + 'đ';
+                    document.getElementById('discountInfo').style.display = 'flex';
+                    document.querySelector('.summary-total-price').textContent = finalTotal.toLocaleString('vi-VN') + 'đ';
+                    document.getElementById('btnApplyPromo').textContent = 'Đã áp dụng';
+                    document.getElementById('btnApplyPromo').style.background = '#10b981';
+                    document.getElementById('promoCode').disabled = true;
+                    alert(res.message);
+                } else {
+                    alert(res.message);
+                }
+            }
+        };
+        xhr.send('code=' + encodeURIComponent(code) + '&cartTotal=' + cartTotal);
+    });
 })();
 </script>
 

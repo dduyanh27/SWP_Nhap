@@ -3,11 +3,13 @@ package com.swp391.se2006.g2.vmfruit.controller;
 import com.swp391.se2006.g2.vmfruit.entity.Cart;
 import com.swp391.se2006.g2.vmfruit.entity.CartItem;
 import com.swp391.se2006.g2.vmfruit.entity.CustomerAddress;
+import com.swp391.se2006.g2.vmfruit.entity.DiscountCode;
 import com.swp391.se2006.g2.vmfruit.entity.Order;
 import com.swp391.se2006.g2.vmfruit.entity.OrderItem;
 import com.swp391.se2006.g2.vmfruit.entity.User;
 import com.swp391.se2006.g2.vmfruit.repository.CartItemRepository;
 import com.swp391.se2006.g2.vmfruit.repository.CustomerAddressRepository;
+import com.swp391.se2006.g2.vmfruit.repository.DiscountCodeRepository;
 import com.swp391.se2006.g2.vmfruit.repository.OrderItemRepository;
 import com.swp391.se2006.g2.vmfruit.repository.OrderRepository;
 import com.swp391.se2006.g2.vmfruit.service.CartService;
@@ -40,6 +42,7 @@ public class CheckoutController {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartItemRepository cartItemRepository;
+    private final DiscountCodeRepository discountCodeRepository;
 
     @Value("${vietqr.bank-id:MB}")
     private String vietQrBankId;
@@ -55,13 +58,15 @@ public class CheckoutController {
                               CustomerAddressRepository addressRepository,
                               OrderRepository orderRepository,
                               OrderItemRepository orderItemRepository,
-                              CartItemRepository cartItemRepository) {
+                              CartItemRepository cartItemRepository,
+                              DiscountCodeRepository discountCodeRepository) {
         this.cartService = cartService;
         this.addressService = addressService;
         this.addressRepository = addressRepository;
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartItemRepository = cartItemRepository;
+        this.discountCodeRepository = discountCodeRepository;
     }
 
     @GetMapping
@@ -109,9 +114,8 @@ public class CheckoutController {
 
     @PostMapping
     @Transactional
-    public String placeOrder(@RequestParam("receiverName") String receiverName,
-                             @RequestParam("phone") String phone,
-                             @RequestParam("fullAddress") String fullAddress,
+    public String placeOrder(@RequestParam(name = "addressId", required = false) Integer addressId,
+                             @RequestParam(name = "discountCode", required = false) String discountCode,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("currentUser");
@@ -125,19 +129,59 @@ public class CheckoutController {
             return "redirect:/cart";
         }
 
-        CustomerAddress orderAddress = new CustomerAddress();
-        orderAddress.setUser(user);
-        orderAddress.setReceiverName(receiverName);
-        orderAddress.setPhone(phone);
-        orderAddress.setFullAddress(fullAddress);
-        orderAddress.setIsDefault(false);
-        addressRepository.save(orderAddress);
+        if (addressId == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui long chon dia chi giao hang truoc khi dat hang.");
+            return "redirect:/checkout";
+        }
+
+        CustomerAddress orderAddress = addressRepository.findById(addressId).orElse(null);
+        if (orderAddress == null || orderAddress.getUser() == null
+                || !user.getUserId().equals(orderAddress.getUser().getUserId())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Dia chi giao hang khong hop le.");
+            return "redirect:/checkout";
+        }
 
         BigDecimal subtotal = cartItems.stream()
                 .map(item -> item.getUnitPrice().multiply(item.getQuantity()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         LocalDateTime now = LocalDateTime.now();
+
+        BigDecimal totalAmount = subtotal;
+        DiscountCode appliedDiscount = null;
+
+        if (discountCode != null && !discountCode.isBlank()) {
+            appliedDiscount = discountCodeRepository.findByCodeIgnoreCase(discountCode.trim()).orElse(null);
+            if (appliedDiscount != null && "ACTIVE".equalsIgnoreCase(appliedDiscount.getStatus())
+                    && !now.isBefore(appliedDiscount.getStartDate())
+                    && !now.isAfter(appliedDiscount.getEndDate())
+                    && (appliedDiscount.getUsageLimit() == null || appliedDiscount.getUsedCount() < appliedDiscount.getUsageLimit())
+                    && subtotal.compareTo(appliedDiscount.getMinOrderAmount()) >= 0) {
+
+                BigDecimal discountAmount;
+                if ("PERCENTAGE".equalsIgnoreCase(appliedDiscount.getDiscountType())) {
+                    discountAmount = subtotal.multiply(appliedDiscount.getDiscountValue())
+                            .divide(new BigDecimal("100"), RoundingMode.HALF_UP);
+                    if (appliedDiscount.getMaxDiscountAmount() != null
+                            && discountAmount.compareTo(appliedDiscount.getMaxDiscountAmount()) > 0) {
+                        discountAmount = appliedDiscount.getMaxDiscountAmount();
+                    }
+                } else {
+                    discountAmount = appliedDiscount.getDiscountValue();
+                }
+
+                totalAmount = subtotal.subtract(discountAmount);
+                if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
+                    totalAmount = BigDecimal.ZERO;
+                }
+
+                appliedDiscount.setUsedCount(appliedDiscount.getUsedCount() + 1);
+                discountCodeRepository.save(appliedDiscount);
+            } else {
+                appliedDiscount = null;
+            }
+        }
+
         Order order = new Order();
         order.setUser(user);
         order.setAddress(orderAddress);
@@ -147,7 +191,8 @@ public class CheckoutController {
         order.setPaymentStatus("PENDING_TRANSFER");
         order.setSubtotalAmount(subtotal);
         order.setShippingFee(BigDecimal.ZERO);
-        order.setTotalAmount(subtotal);
+        order.setDiscount(appliedDiscount);
+        order.setTotalAmount(totalAmount);
         orderRepository.save(order);
 
         for (CartItem cartItem : cartItems) {
@@ -166,6 +211,24 @@ public class CheckoutController {
         cartItemRepository.deleteByCart_CartId(cart.getCartId());
 
         return "redirect:/checkout/payment-success?orderId=" + order.getOrderId();
+    }
+
+    @PostMapping("/address/add")
+    @Transactional
+    public String addAddress(@RequestParam("receiverName") String receiverName,
+                             @RequestParam("phone") String phone,
+                             @RequestParam("fullAddress") String fullAddress,
+                             @RequestParam(value = "isDefault", required = false) String isDefault,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        addressService.addAddress(user.getUserId(), receiverName, phone, fullAddress, "1".equals(isDefault));
+        redirectAttributes.addFlashAttribute("successMessage", "Them dia chi giao hang thanh cong.");
+        return "redirect:/checkout";
     }
 
     private String encode(String value) {

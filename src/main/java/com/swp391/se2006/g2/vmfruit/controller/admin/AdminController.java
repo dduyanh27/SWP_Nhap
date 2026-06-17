@@ -7,11 +7,7 @@ import com.swp391.se2006.g2.vmfruit.entity.Category;
 import com.swp391.se2006.g2.vmfruit.entity.Product;
 import com.swp391.se2006.g2.vmfruit.entity.User;
 import com.swp391.se2006.g2.vmfruit.repository.CategoryRepository;
-import com.swp391.se2006.g2.vmfruit.service.AdminBatchService;
-import com.swp391.se2006.g2.vmfruit.service.AdminCategoryService;
-import com.swp391.se2006.g2.vmfruit.service.AdminProductService;
-import com.swp391.se2006.g2.vmfruit.service.AdminService;
-import com.swp391.se2006.g2.vmfruit.service.UserService;
+import com.swp391.se2006.g2.vmfruit.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -108,11 +104,6 @@ public class AdminController {
         return "redirect:/admin/products";
     }
 
-    /**
-     * POST /admin/categories/create
-     * Tạo category mới rồi redirect về trang New/Edit Product.
-     * Tham số "returnId" nếu có → redirect về trang Edit Product (id=returnId).
-     */
     @PostMapping("/categories/create")
     public String createCategory(@RequestParam("categoryName")           String categoryName,
                                  @RequestParam(value = "returnId", required = false) Integer returnId,
@@ -156,45 +147,10 @@ public class AdminController {
 
     }
 
-    @GetMapping("/batches")
-    public String showBatchManagement(Model model) {
-        BatchStatsResponse stats = adminBatchService.getBatchStats();
-        model.addAttribute("activeBatchesCount",   stats.getActiveBatchesCount());
-        model.addAttribute("expiringBatchesCount", stats.getExpiringBatchesCount());
-        model.addAttribute("liquidatedLotsCount",  stats.getLiquidatedLotsCount());
-        List<com.swp391.se2006.g2.vmfruit.dto.response.BatchGroupResponse> batchList =
-                adminBatchService.getBatchManagementData();
-        model.addAttribute("batchGroups", batchList);
-        model.addAttribute("contentPage", "admin/batches");
-        model.addAttribute("activeMenu", "batch-manage");
-        return "layouts/admin-layout";
-    }
-
-//    @GetMapping("/orders")
-//    public String showOrders(Model model) {
-//        model.addAttribute("contentPage", "admin/orders");
-//        model.addAttribute("activeMenu", "order-manage");
-//        return "layouts/admin-layout";
-//    }
-
-    @GetMapping("/discounts")
-    public String showDiscounts(Model model) {
-        model.addAttribute("contentPage", "admin/discounts");
-        model.addAttribute("activeMenu", "discount-code");
-        return "layouts/admin-layout";
-    }
-
     @GetMapping("/payments")
     public String showPayments(Model model) {
         model.addAttribute("contentPage", "admin/payments");
         model.addAttribute("activeMenu", "payment-manage");
-        return "layouts/admin-layout";
-    }
-
-    @GetMapping("/reports")
-    public String showReports(Model model) {
-        model.addAttribute("contentPage", "admin/reports");
-        model.addAttribute("activeMenu", "report-manage");
         return "layouts/admin-layout";
     }
 }

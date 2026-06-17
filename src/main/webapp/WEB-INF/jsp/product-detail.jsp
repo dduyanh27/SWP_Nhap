@@ -277,6 +277,33 @@ document.querySelector('.btn-add-cart').addEventListener('click', function(e) {
     document.body.appendChild(form);
     form.submit();
 });
+
+document.querySelector('.btn-buy-now').addEventListener('click', function() {
+    var productId = document.querySelector('.btn-add-cart').getAttribute('data-product-id');
+    var quantity = document.getElementById('productQty').value || 1;
+
+    if (!isLoggedIn) {
+        window.location.href = '${pageContext.request.contextPath}/login';
+        return;
+    }
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.style.display = 'none';
+    form.action = '${pageContext.request.contextPath}/cart/add';
+    var inputPid = document.createElement('input');
+    inputPid.type = 'hidden';
+    inputPid.name = 'productId';
+    inputPid.value = productId;
+    form.appendChild(inputPid);
+    var inputQty = document.createElement('input');
+    inputQty.type = 'hidden';
+    inputQty.name = 'quantity';
+    inputQty.value = quantity;
+    form.appendChild(inputQty);
+    document.body.appendChild(form);
+    form.submit();
+});
 </script>
 
 <jsp:include page="common/footer.jsp" />

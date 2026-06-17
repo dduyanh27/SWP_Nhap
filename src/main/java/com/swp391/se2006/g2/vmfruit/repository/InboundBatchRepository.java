@@ -4,6 +4,7 @@ import com.swp391.se2006.g2.vmfruit.entity.InboundBatch;
 import com.swp391.se2006.g2.vmfruit.dto.response.BatchGroupResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
@@ -16,4 +17,7 @@ public interface InboundBatchRepository extends JpaRepository<InboundBatch, Inte
 
     @Query("SELECT b.importReceipt.importReceiptId FROM InboundBatch b")
     List<Integer> findAllImportReceiptIds();
+
+    @Query("SELECT b FROM InboundBatch b WHERE b.batchStatus != 'DELETED'")
+    List<InboundBatch> findAllActive();
 }
