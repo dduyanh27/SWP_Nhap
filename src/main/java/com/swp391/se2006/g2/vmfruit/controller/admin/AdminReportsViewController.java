@@ -25,7 +25,7 @@ public class AdminReportsViewController {
         model.addAttribute("suppliers", adminImportReceiptService.getActiveSuppliers());
         model.addAttribute("products",  adminImportReceiptService.getActiveProducts());
         model.addAttribute("defaultDate", LocalDate.now().plusDays(7).toString());
-        return "admin/reports"; // Trả về đúng file reports.jsp của bạn
+        return "create-import"; // Trả về đúng file create-import.jsp của bạn
     }
 
     // TÍNH NĂNG 2: TRANG DANH SÁCH (Được dời sang URL /admin/reports/list)

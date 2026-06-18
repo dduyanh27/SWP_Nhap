@@ -5,6 +5,13 @@
 
                 <h1 class="admin-page-title">Fruit Management</h1>
 
+                <c:if test="${not empty message}">
+                    <div class="nf-alert nf-alert--success">${message}</div>
+                </c:if>
+                <c:if test="${not empty error}">
+                    <div class="nf-alert nf-alert--error">${error}</div>
+                </c:if>
+
                 <div class="stat-cards-grid">
                     <div class="stat-card">
                         <div class="stat-card-label">Low Stock Product</div>
@@ -28,7 +35,7 @@
                     <form id="filterForm" method="get" action="${pageContext.request.contextPath}/admin/products"
                         style="display:contents;">
                         <div class="toolbar-left">
-                            <select name="sort" class="admin-select" onchange="this.form.submit()">
+                            <select name="sort" class="admin-select">
                                 <option value="stock_asc" ${currentSort=='stock_asc' ? 'selected' : '' }>Stock ASC
                                     (Sort)</option>
                                 <option value="stock_desc" ${currentSort=='stock_desc' ? 'selected' : '' }>Stock DESC
@@ -39,7 +46,7 @@
                                     (Sort)</option>
                             </select>
 
-                            <select name="price" class="admin-select" onchange="this.form.submit()">
+                            <select name="price" class="admin-select">
                                 <option value="" ${currentPrice=='' ? 'selected' : '' }>All Price (Filter)</option>
                                 <option value="under_100" ${currentPrice=='under_100' ? 'selected' : '' }>Under 100.000đ
                                 </option>
@@ -48,6 +55,7 @@
                                 <option value="over_300" ${currentPrice=='over_300' ? 'selected' : '' }>Over 300.000đ
                                 </option>
                             </select>
+                            <button type="submit" class="admin-select" style="cursor:pointer;">Filter</button>
                         </div>
 
                         <a href="${pageContext.request.contextPath}/admin/products/new" id="btnAddProduct"

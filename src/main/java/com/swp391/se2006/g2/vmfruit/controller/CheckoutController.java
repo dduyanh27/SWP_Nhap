@@ -52,6 +52,7 @@ public class CheckoutController {
 
     @Value("${vietqr.account-name:VMFRUIT}")
     private String vietQrAccountName;
+    private Integer addressId;
 
     public CheckoutController(CartService cartService,
                               CustomerAddressService addressService,
@@ -128,7 +129,6 @@ public class CheckoutController {
             redirectAttributes.addFlashAttribute("errorMessage", "Gio hang dang trong, khong the dat hang.");
             return "redirect:/cart";
         }
-
         if (addressId == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Vui long chon dia chi giao hang truoc khi dat hang.");
             return "redirect:/checkout";

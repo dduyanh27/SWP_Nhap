@@ -40,8 +40,8 @@
         </select>
     </div>
 
-    <a href="#" class="btn-add-product">
-        + Create Import Receipt
+    <a href="admin/create-import" class="btn-add-product">
+       + Create Import Receip
     </a>
 </div>
 

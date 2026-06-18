@@ -32,7 +32,6 @@ public class AdminBatchController {
         return "layouts/admin-layout";
     }
 
-    // ── DELETE cũ (giữ lại để backward compat) ────────────────────
     @PostMapping("/delete/{id}")
     public String deleteBatch(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
         try {
@@ -44,11 +43,6 @@ public class AdminBatchController {
         return "redirect:/admin/batches";
     }
 
-    // ── Remove Item: chuyển item sang CANCELLED ───────────────────
-    /**
-     * POST /admin/batches/{batchId}/items/{itemId}/remove
-     * Chuyển BatchItem sang CANCELLED (giữ nguyên lịch sử nhập kho).
-     */
     @PostMapping("/{batchId}/items/{itemId}/remove")
     public String removeItem(
             @PathVariable("batchId") Integer batchId,
@@ -65,11 +59,6 @@ public class AdminBatchController {
         return "redirect:/admin/batches";
     }
 
-    // ── Cancel Batch: hủy toàn bộ lô (chỉ khi chưa xuất bán) ──────
-    /**
-     * POST /admin/batches/{batchId}/cancel
-     * Hủy toàn bộ lô hàng. Chỉ cho phép nếu lô chưa xuất bán sản phẩm nào.
-     */
     @PostMapping("/{batchId}/cancel")
     public String cancelBatch(
             @PathVariable("batchId") Integer batchId,
@@ -79,7 +68,6 @@ public class AdminBatchController {
             redirectAttributes.addFlashAttribute("message",
                     "Lô hàng B" + String.format("%04d", batchId) + " đã bị hủy thành công.");
         } catch (IllegalStateException e) {
-            // Lô đã có hàng xuất bán — không cho phép
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error",

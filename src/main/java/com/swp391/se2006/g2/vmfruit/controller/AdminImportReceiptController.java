@@ -1,5 +1,6 @@
 package com.swp391.se2006.g2.vmfruit.controller;
 
+import com.swp391.se2006.g2.vmfruit.entity.ImportReceipt;
 import com.swp391.se2006.g2.vmfruit.service.AdminImportReceiptService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin/import-receipts")
@@ -36,4 +39,5 @@ public class AdminImportReceiptController {
         model.addAttribute("activeMenu", "import-receipt-manage");
         return "layouts/admin-layout";
     }
+
 }
